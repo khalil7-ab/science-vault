@@ -29,8 +29,13 @@
     <title>SciVault - Plateforme Scientifique & Ressources</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- SDKs Firebase / Firestore (Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
     <script>
-        
+        // Configuration Tailwind
         tailwind.config = {
             darkMode: 'class',
             theme: {
@@ -73,48 +78,80 @@
                     }
                 }
             }
-        }
-        function saveNewArticle(e) {
-        e.preventDefault();
-
-        const domainSelectValue = document.getElementById('newSubject').value;
-        const customDomainValue = document.getElementById('customDomainInput').value.trim();
-
-         const finalDomain = (domainSelectValue === 'Autre Domaine' && customDomainValue !== '') 
-        ? customDomainValue 
-        : domainSelectValue;
-
-        const newArticle = {
-        id: Date.now(),
-        title: document.getElementById('newTitle').value,
-        subject: finalDomain,
-        author: document.getElementById('newAuthor').value,
-        description: document.getElementById('newDesc').value,
-        pdfUrl: document.getElementById('newPdf').value,
-        driveUrl: document.getElementById('newDrive').value,
-        externalUrl: document.getElementById('newExternal').value,
-        date: new Date().toISOString().split('T')[0]
         };
 
-        articles.unshift(newArticle);
-        localStorage.setItem('scivault_articles', JSON.stringify(articles));
-       
-         e.target.reset();
-       document.getElementById('customDomainInput').classList.add('hidden');
-        closeModal();
-        renderArticles();
+        // Configuration & Initialisation Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCwnh4g3EJ1Sl7C_xHsaO5GfVauj_Tb8FE",
+            authDomain: "scivault.firebaseapp.com",
+            projectId: "scivault",
+            storageBucket: "scivault.firebasestorage.app",
+            messagingSenderId: "259522826550",
+            appId: "1:259522826550:web:3ba74241e9d882c2736397"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Sync en temps réel m3a Firestore (Real-time Listener)
+        db.collection("articles").orderBy("createdAt", "desc").onSnapshot((snapshot) => {
+            const cloudArticles = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            
+            // Si la base est encore vide, afficher les articles par défaut (initialArticles)
+            articles = cloudArticles.length > 0 ? cloudArticles : (typeof initialArticles !== 'undefined' ? initialArticles : []);
+            renderArticles();
+        });
+
+        // Fonction d'ajout d'un nouvel article vers le Cloud
+        function saveNewArticle(e) {
+            e.preventDefault();
+
+            const domainSelectValue = document.getElementById('newSubject').value;
+            const customDomainValue = document.getElementById('customDomainInput').value.trim();
+
+            const finalDomain = (domainSelectValue === 'Autre Domaine' && customDomainValue !== '') 
+                ? customDomainValue 
+                : domainSelectValue;
+
+            const newArticle = {
+                title: document.getElementById('newTitle').value,
+                subject: finalDomain,
+                author: document.getElementById('newAuthor').value,
+                description: document.getElementById('newDesc').value,
+                pdfUrl: document.getElementById('newPdf').value,
+                driveUrl: document.getElementById('newDrive').value,
+                externalUrl: document.getElementById('newExternal').value,
+                date: new Date().toISOString().split('T')[0],
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            // Envoi dans Cloud Firestore
+            db.collection("articles").add(newArticle)
+            .then(() => {
+                e.target.reset();
+                document.getElementById('customDomainInput').classList.add('hidden');
+                closeModal();
+            })
+            .catch((error) => {
+                console.error("Erreur d'ajout : ", error);
+                alert("Erreur lors de la publication de l'article.");
+            });
         }
+
         function toggleCustomDomainInput() {
-        const domainSelect = document.getElementById('newSubject');
-        const customInput = document.getElementById('customDomainInput');
-    
-        if (domainSelect.value === 'Autre Domaine') {
-        customInput.classList.remove('hidden');
-        customInput.focus();
-        } else {
-        customInput.classList.add('hidden');
-        customInput.value = '';
-        }
+            const domainSelect = document.getElementById('newSubject');
+            const customInput = document.getElementById('customDomainInput');
+        
+            if (domainSelect.value === 'Autre Domaine') {
+                customInput.classList.remove('hidden');
+                customInput.focus();
+            } else {
+                customInput.classList.add('hidden');
+                customInput.value = '';
+            }
         }
     </script>
     <!-- Google Fonts -->
