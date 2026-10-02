@@ -30,6 +30,7 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
+        
         tailwind.config = {
             darkMode: 'class',
             theme: {
@@ -72,6 +73,48 @@
                     }
                 }
             }
+        }
+        function saveNewArticle(e) {
+        e.preventDefault();
+
+        const domainSelectValue = document.getElementById('newSubject').value;
+        const customDomainValue = document.getElementById('customDomainInput').value.trim();
+
+         const finalDomain = (domainSelectValue === 'Autre Domaine' && customDomainValue !== '') 
+        ? customDomainValue 
+        : domainSelectValue;
+
+        const newArticle = {
+        id: Date.now(),
+        title: document.getElementById('newTitle').value,
+        subject: finalDomain,
+        author: document.getElementById('newAuthor').value,
+        description: document.getElementById('newDesc').value,
+        pdfUrl: document.getElementById('newPdf').value,
+        driveUrl: document.getElementById('newDrive').value,
+        externalUrl: document.getElementById('newExternal').value,
+        date: new Date().toISOString().split('T')[0]
+        };
+
+        articles.unshift(newArticle);
+        localStorage.setItem('scivault_articles', JSON.stringify(articles));
+       
+         e.target.reset();
+       document.getElementById('customDomainInput').classList.add('hidden');
+        closeModal();
+        renderArticles();
+        }
+        function toggleCustomDomainInput() {
+        const domainSelect = document.getElementById('newSubject');
+        const customInput = document.getElementById('customDomainInput');
+    
+        if (domainSelect.value === 'Autre Domaine') {
+        customInput.classList.remove('hidden');
+        customInput.focus();
+        } else {
+        customInput.classList.add('hidden');
+        customInput.value = '';
+        }
         }
     </script>
     <!-- Google Fonts -->
@@ -385,15 +428,16 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-semibold text-slate-300 mb-1">Domaine / Sujet *</label>
-                        <select id="newSubject" required class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl focus:outline-none focus:border-purple-500 text-slate-200 text-sm">
-                            <option value="Intelligence Artificielle">Intelligence Artificielle</option>
-                            <option value="Physique Quantique">Physique Quantique</option>
-                            <option value="Biotechnologie">Biotechnologie</option>
-                            <option value="Informatique & Réseaux">Informatique & Réseaux</option>
-                            <option value="Mathématiques">Mathématiques</option>
-                            <option value="Neurosciences">Neurosciences</option>
-                            <option value="Autre Domaine">Autre Domaine</option>
-                        </select>
+                        <select id="newSubject" required onchange="toggleCustomDomainInput()" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700/80 rounded-xl text-slate-200 text-sm focus:outline-none focus:border-cyan-400">
+                        <option value="Intelligence Artificielle">Intelligence Artificielle</option>
+                        <option value="Physique Quantique">Physique Quantique</option>
+                        <option value="Biotechnologie">Biotechnologie</option>
+                           <option value="Informatique & Réseaux">Informatique & Réseaux</option>
+                        <option value="Mathématiques">Mathématiques</option>
+                        <option value="Neurosciences">Neurosciences</option>
+                         <option value="Autre Domaine">Autre Domaine</option>
+                       </select>
+<input type="text" id="customDomainInput" placeholder="Saisissez le nom du domaine..." class="hidden mt-2 w-full px-4 py-2 bg-slate-900 border border-cyan-500/50 rounded-xl text-cyan-300 text-sm placeholder-slate-500 focus:outline-none">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-300 mb-1">Auteur / Source *</label>
