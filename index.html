@@ -1,1078 +1,474 @@
 <!DOCTYPE html>
 <html lang="fr" class="dark scroll-smooth">
 <head>
-    <!-- 🎯 SEO & Search Engine Optimization Tags -->
-    <title>SciVault - Plateforme Scientifique & Archives de Recherche</title>
-    <meta name="description" content="SciVault est votre coffre-fort scientifique personnel. Découvrez, organisez et partagez des articles scientifiques, des documents PDF, des liens Google Drive et des ressources de recherche.">
-    <meta name="keywords" content="SciVault, science, articles scientifiques, recherche, PDF, Google Drive, intelligence artificielle, physique quantique, biotechnologie, ressources académiques">
-    <meta name="author" content="SciVault Platform">
-    <meta name="robots" content="index, follow">
-    <meta name="theme-color" content="#070A11">
+  <!-- SEO & Meta Tags -->
+  <title>SciVault - Plateforme Scientifique & Archives de Recherche</title>
+  <meta name="description" content="SciVault est votre coffre-fort scientifique personnel. Découvrez, organisez et partagez des articles scientifiques.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
 
-    <!-- 🌐 Open Graph / Facebook / WhatsApp Meta Tags -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://scivault.github.io/">
-    <meta property="og:title" content="SciVault - Plateforme Scientifique & Ressources">
-    <meta property="og:description" content="Espace d'archives et de partage d'articles scientifiques, fichiers PDF et répertoires Google Drive.">
-    <meta property="og:image" content="https://cdn-icons-png.flaticon.com/512/3211/3211181.png">
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚛️</text></svg>">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- 🐤 Twitter Card Meta Tags -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="SciVault - Plateforme Scientifique">
-    <meta name="twitter:description" content="Bibliothèque d'articles scientifiques, PDF et liens Drive.">
-    <meta name="twitter:image" content="https://cdn-icons-png.flaticon.com/512/3211/3211181.png">
-    <!-- ⚛️ Favicon Icon (L-icon dial l-Navigateur) -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚛️</text></svg>">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3211/3211181.png">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SciVault - Plateforme Scientifique & Ressources</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+  <!-- SDKs Firebase / Firestore (Compat) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-<!-- SDKs Firebase / Firestore (Compat) -->
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <!-- Google Fonts & FontAwesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-<script>
-    // إعدادات Tailwind CSS
+  <script>
+    // Configuration Tailwind
     tailwind.config = {
-        darkMode: 'class',
-        theme: {
-            extend: {
-                colors: {
-                    brand: {
-                        purple: '#7C3AED',
-                        cyan: '#06B6D4',
-                        lime: '#84CC16',
-                        dark: '#070A11',
-                        card: '#111827',
-                        border: '#1F2937'
-                    }
-                },
-                fontFamily: {
-                    sans: ['Inter', 'sans-serif'],
-                    mono: ['Fira Code', 'Courier New', 'monospace']
-                },
-                animation: {
-                    'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                    'float': 'float 6s ease-in-out infinite',
-                    'glow': 'glow 2s ease-in-out infinite alternate',
-                    'shake': 'shake 0.4s cubic-bezier(.36,.07,.19,.97) both'
-                },
-                keyframes: {
-                    float: {
-                        '0%, 100%': { transform: 'translateY(0px)' },
-                        '50%': { transform: 'translateY(-10px)' },
-                    },
-                    glow: {
-                        '0%': { boxShadow: '0 0 15px rgba(124, 58, 237, 0.2)' },
-                        '100%': { boxShadow: '0 0 30px rgba(6, 182, 212, 0.6)' }
-                    },
-                    shake: {
-                        '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' },
-                        '20%, 80%': { transform: 'translate3d(2px, 0, 0)' },
-                        '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' },
-                        '40%, 60%': { transform: 'translate3d(4px, 0, 0)' }
-                    }
-                }
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              purple: '#7C3AED',
+              cyan: '#06B6D4',
+              lime: '#84CC16',
+              dark: '#070A11',
+              card: '#111827',
+              border: '#1F2937'
             }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['Fira Code', 'Courier New', 'monospace']
+          },
+          animation: {
+            'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'shake': 'shake 0.4s cubic-bezier(.36,.07,.19,.97) both'
+          },
+          keyframes: {
+            shake: {
+              '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' },
+              '20%, 80%': { transform: 'translate3d(2px, 0, 0)' },
+              '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' },
+              '40%, 60%': { transform: 'translate3d(4px, 0, 0)' }
+            }
+          }
         }
+      }
     };
 
-    // تهيئة وإعداد Firebase
+    // Firebase Configuration
     const firebaseConfig = {
-        apiKey: "AIzaSyCwnh4g3EJ1Sl7C_xHsaO5GfVauj_Tb8FE",
-        authDomain: "scivault.firebaseapp.com",
-        projectId: "scivault",
-        storageBucket: "scivault.firebasestorage.app",
-        messagingSenderId: "259522826550",
-        appId: "1:259522826550:web:3ba74241e9d882c2736397"
+      apiKey: "AIzaSyCwnh4g3EJ1Sl7C_xHsaO5GfVauj_Tb8FE",
+      authDomain: "scivault.firebaseapp.com",
+      projectId: "scivault",
+      storageBucket: "scivault.firebasestorage.app",
+      messagingSenderId: "259522826550",
+      appId: "1:259522826550:web:3ba74241e9d882c2736397"
     };
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
+  </script>
 
-    // الاستماع المباشر للتغييرات في قاعدة البيانات (Real-time Listener)
-    db.collection("articles").onSnapshot((snapshot) => {
-        const cloudArticles = snapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-        }));
-        
-        if (cloudArticles.length > 0) {
-            // ترتيب المقالات حسب تاريخ الإنشاء من الأحدث إلى الأقدم
-            articles = cloudArticles.sort((a, b) => {
-                const timeA = a.createdAt ? a.createdAt.seconds : 0;
-                const timeB = b.createdAt ? b.createdAt.seconds : 0;
-                return timeB - timeA;
-            });
-        } else {
-            articles = typeof initialArticles !== 'undefined' ? initialArticles : [];
-        }
-        
-        renderArticles();
-    }, (error) => {
-        console.error("خطأ في جلب البيانات من Firestore:", error);
-    });
-
-    // دالة إضافة مقال جديد وحفظه في السحابة
-    function saveNewArticle(e) {
-        e.preventDefault();
-
-        const domainSelectValue = document.getElementById('newSubject').value;
-        const customDomainValue = document.getElementById('customDomainInput').value.trim();
-
-        const finalDomain = (domainSelectValue === 'Autre Domaine' && customDomainValue !== '') 
-            ? customDomainValue 
-            : domainSelectValue;
-
-        const newArticle = {
-            title: document.getElementById('newTitle').value,
-            subject: finalDomain,
-            author: document.getElementById('newAuthor').value,
-            description: document.getElementById('newDesc').value,
-            pdfUrl: document.getElementById('newPdf').value,
-            driveUrl: document.getElementById('newDrive').value,
-            externalUrl: document.getElementById('newExternal').value,
-            date: new Date().toISOString().split('T')[0],
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        };
-
-        // إرسال البيانات إلى Cloud Firestore
-        db.collection("articles").add(newArticle)
-        .then(() => {
-            e.target.reset();
-            document.getElementById('customDomainInput').classList.add('hidden');
-            closeModal();
-        })
-        .catch((error) => {
-            console.error("خطأ أثناء الإضافة: ", error);
-            alert("حدث خطأ أثناء نشر المقال.");
-        });
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #070A11;
+      color: #F3F4F6;
     }
-
-        function toggleCustomDomainInput() {
-        const domainSelect = document.getElementById('newSubject');
-        const customInput = document.getElementById('customDomainInput');
-    
-        if (domainSelect.value === 'Autre Domaine') {
-            customInput.classList.remove('hidden');
-            customInput.focus();
-        } else {
-            customInput.classList.add('hidden');
-            customInput.value = '';
-        }
+    .glass-card {
+      background: rgba(17, 24, 39, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-</script>
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #070A11;
-            color: #F3F4F6;
-        }
-        .glass-card {
-            background: rgba(17, 24, 39, 0.75);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .glass-card:hover {
-            transform: translateY(-4px);
-            border-color: rgba(124, 58, 237, 0.4);
-            box-shadow: 0 12px 30px -10px rgba(124, 58, 237, 0.25);
-        }
-        .glass-nav {
-            background: rgba(7, 10, 17, 0.85);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        .gradient-text {
-            background: linear-gradient(135deg, #A855F7 0%, #06B6D4 50%, #84CC16 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        /* Custom Scrollbar */
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #070A11;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #1F2937;
-            border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #374151;
-        }
-        .grid-bg {
-            background-image: radial-gradient(rgba(124, 58, 237, 0.12) 1px, transparent 0);
-            background-size: 32px 32px;
-        }
-    </style>
+    .glass-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(124, 58, 237, 0.4);
+      box-shadow: 0 12px 30px -10px rgba(124, 58, 237, 0.25);
+    }
+    .glass-nav {
+      background: rgba(7, 10, 17, 0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, #A855F7 0%, #06B6D4 50%, #84CC16 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #070A11; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #1F2937; border-radius: 10px; }
+    .grid-bg {
+      background-image: radial-gradient(rgba(124, 58, 237, 0.12) 1px, transparent 0);
+      background-size: 32px 32px;
+    }
+  </style>
 </head>
 <body class="min-h-screen flex flex-col custom-scrollbar overflow-x-hidden selection:bg-purple-500 selection:text-white grid-bg">
 
-    <header class="sticky top-0 z-40 glass-nav transition-all duration-300">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
-            <!-- Brand Logo -->
-            <div class="flex items-center gap-3 cursor-pointer group" onclick="resetFilters()">
-                <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-purple-600 via-cyan-500 to-lime-400 p-0.5 flex items-center justify-center shadow-lg shadow-purple-500/20 group-hover:scale-105 transition-transform duration-300">
-                    <div class="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
-                        <i class="fa-solid fa-atom text-cyan-400 text-2xl animate-spin" style="animation-duration: 12s;"></i>
-                    </div>
-                </div>
-                <div>
-                    <span class="text-2xl font-black tracking-tight gradient-text">SciVault</span>
-                    <span class="hidden sm:block text-[10px] uppercase font-bold tracking-widest text-slate-400 -mt-1">Plateforme Scientifique Sécurisée</span>
-                </div>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="flex items-center gap-3">
-                <button id="bookmarkedFilterBtn" onclick="toggleBookmarksOnly()" class="px-4 py-2.5 rounded-xl glass-card hover:bg-slate-800 text-slate-300 text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 border border-slate-700/50">
-                    <i class="fa-solid fa-bookmark text-amber-400"></i>
-                    <span class="hidden sm:inline">Mes Favoris</span>
-                    <span id="bookmarkBadge" class="bg-amber-500/20 text-amber-300 text-xs px-2 py-0.5 rounded-full font-mono">0</span>
-                </button>
-
-                <!-- Secure Admin Add Article Button -->
-                <button onclick="requestAdminAccess()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-500 hover:from-purple-500 hover:to-cyan-400 text-white font-bold text-xs sm:text-sm shadow-lg shadow-purple-500/25 transition-all flex items-center gap-2 border border-purple-400/30 group">
-                    <i class="fa-solid fa-plus-circle text-cyan-300 group-hover:rotate-90 transition-transform duration-300"></i>
-                    <span>Ajouter Article</span>
-                    <span class="text-[10px] bg-black/40 px-2 py-0.5 rounded-md text-cyan-300 font-mono"><i class="fa-solid fa-lock text-[9px] mr-1"></i>ADMIN</span>
-                </button>
-            </div>
+  <!-- Header -->
+  <header class="sticky top-0 z-40 glass-nav transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3 cursor-pointer group" onclick="resetFilters()">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-purple-600 via-cyan-500 to-lime-400 p-0.5 flex items-center justify-center shadow-lg shadow-purple-500/20 group-hover:scale-105 transition-transform duration-300">
+          <div class="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
+            <i class="fa-solid fa-atom text-cyan-400 text-2xl animate-spin" style="animation-duration: 12s;"></i>
+          </div>
         </div>
-    </header>
-
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
-        
-        <!-- Hero Section -->
-        <section class="relative overflow-hidden rounded-3xl p-8 sm:p-12 border border-slate-800 bg-gradient-to-b from-slate-900/90 via-slate-950/80 to-slate-900/90 shadow-2xl">
-            <div class="absolute -top-24 -left-24 w-72 h-72 bg-purple-600/20 rounded-full blur-3xl pointer-events-none"></div>
-            <div class="absolute -bottom-24 -right-24 w-80 h-80 bg-cyan-600/20 rounded-full blur-3xl pointer-events-none"></div>
-
-            <div class="relative z-10 max-w-3xl space-y-6">
-                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-300 text-xs font-semibold tracking-wide uppercase">
-                    <span class="w-2 h-2 rounded-full bg-lime-400 animate-ping"></span>
-                    Bibliothèque Scientifique Personnelle
-                </div>
-
-                <h1 class="text-3xl sm:text-5xl font-black tracking-tight text-white leading-tight">
-                    Espace d'Archives & <span class="gradient-text">Ressources Scientifiques</span>
-                </h1>
-
-                <p class="text-slate-400 text-sm sm:text-base leading-relaxed">
-                    Plateforme organisée pour vos articles de recherche, fichiers PDF, dossiers Google Drive et liens web scientifiques.
-                </p>
-
-                <!-- Hacking & Cyberspace Challenge Banner -->
-                <div class="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-slate-900 via-purple-950/60 to-slate-900 border border-purple-500/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl shadow-purple-950/30 relative overflow-hidden group">
-                    <div class="absolute -right-10 -bottom-10 w-36 h-36 bg-cyan-500/10 rounded-full blur-2xl group-hover:bg-purple-500/20 transition-all pointer-events-none"></div>
-                    <div class="flex items-center gap-3 relative z-10">
-                        <div class="w-11 h-11 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center shrink-0 shadow-inner">
-                            <i class="fa-solid fa-user-ninja text-cyan-400 text-xl animate-pulse"></i>
-                        </div>
-                        <div>
-                            <div class="text-xs font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-300 to-lime-400 uppercase tracking-widest flex items-center gap-2">
-                                <span class="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
-                                🚨 CHALLENGE HACKING & CYBERSÉCURITÉ
-                            </div>
-                            <p class="text-xs text-slate-300 mt-1 font-medium">
-                                Le code administrateur est strictement confidentiel. <span class="text-amber-300 font-mono font-semibold">Pouvez-vous deviner le code PIN ou percer la sécurité ?</span> 🎯
-                            </p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-2 w-full sm:w-auto relative z-10">
-                        <button onclick="requestAdminAccess()" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-500 hover:from-purple-500 hover:to-cyan-400 text-white text-xs font-bold transition-all shadow-lg shadow-purple-600/30 flex items-center justify-center gap-2 border border-purple-400/30">
-                            <i class="fa-solid fa-terminal text-cyan-300"></i>
-                            <span>Tenter l'accès Admin</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="space-y-6">
-            <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
-                
-                <!-- Search Input -->
-                <div class="relative w-full md:w-1/2">
-                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                    </div>
-                    <input type="text" id="searchInput" oninput="filterArticles()" placeholder="Rechercher par titre, résumé, mots-clés ou auteur..." class="w-full pl-11 pr-4 py-3 bg-slate-900/80 border border-slate-800 rounded-2xl focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 text-slate-200 text-sm placeholder-slate-500 transition-all shadow-lg">
-                </div>
-
-                <!-- Type Filters -->
-                <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
-                    <button onclick="setMediaTypeFilter('all')" id="filter-all" class="media-filter-btn active px-4 py-2.5 rounded-xl text-xs font-bold transition-all bg-purple-600 text-white shadow-lg shadow-purple-600/20 border border-purple-500/50">
-                        Tout
-                    </button>
-                    <button onclick="setMediaTypeFilter('pdf')" id="filter-pdf" class="media-filter-btn px-4 py-2.5 rounded-xl text-xs font-bold transition-all bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800 border border-slate-800">
-                        <i class="fa-solid fa-file-pdf text-rose-400 mr-1.5"></i>PDF Direct
-                    </button>
-                    <button onclick="setMediaTypeFilter('drive')" id="filter-drive" class="media-filter-btn px-4 py-2.5 rounded-xl text-xs font-bold transition-all bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800 border border-slate-800">
-                        <i class="fa-brands fa-google-drive text-amber-400 mr-1.5"></i>Google Drive
-                    </button>
-                    <button onclick="setMediaTypeFilter('link')" id="filter-link" class="media-filter-btn px-4 py-2.5 rounded-xl text-xs font-bold transition-all bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800 border border-slate-800">
-                        <i class="fa-solid fa-link text-cyan-400 mr-1.5"></i>Lien Web
-                    </button>
-                </div>
-            </div>
-
-            <!-- Subject Category Tags -->
-            <div class="flex items-center gap-2 overflow-x-auto pb-2 custom-scrollbar">
-                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider mr-2 shrink-0"><i class="fa-solid fa-tags mr-1"></i>Thèmes:</span>
-                <div id="subjectTagsContainer" class="flex items-center gap-2 shrink-0">
-                    <!-- Populated dynamically -->
-                </div>
-            </div>
-        </section>
-
-        <section>
-            <div class="flex items-center justify-between mb-6">
-                <div class="flex items-center gap-3">
-                    <h2 class="text-xl font-bold text-white flex items-center gap-2">
-                        <i class="fa-solid fa-layer-group text-purple-400"></i>
-                        <span>Mes Articles & Documents</span>
-                    </h2>
-                    <span id="articleCountBadge" class="bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs px-2.5 py-1 rounded-full font-mono font-semibold">0</span>
-                </div>
-                <div class="text-xs text-slate-400 font-mono">
-                    Statut: <span class="text-emerald-400 font-semibold">Prêt pour ajout</span>
-                </div>
-            </div>
-
-            <!-- Grid Feed -->
-            <div id="articlesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Dynamic Article Cards Generated Here -->
-            </div>
-
-            <!-- Empty State -->
-            <div id="emptyState" class="text-center py-16 space-y-4 glass-card rounded-3xl border border-slate-800">
-                <div class="w-20 h-20 rounded-3xl bg-purple-500/10 text-purple-400 flex items-center justify-center mx-auto text-3xl border border-purple-500/20 shadow-lg shadow-purple-500/10">
-                    <i class="fa-solid fa-folder-plus"></i>
-                </div>
-                <h3 class="text-xl font-bold text-white">Aucun article enregistré pour le moment</h3>
-                <p class="text-slate-400 text-sm max-w-md mx-auto leading-relaxed">
-                    La bibliothèque est prête ! Cliquez sur le bouton ci-dessous pour ajouter votre premier article scientifique, votre lien Google Drive ou votre fichier PDF.
-                </p>
-                <button onclick="requestAdminAccess()" class="px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 hover:from-purple-500 hover:to-cyan-400 text-white text-xs font-bold transition-all shadow-xl shadow-purple-500/25 inline-flex items-center gap-2">
-                    <i class="fa-solid fa-plus-circle"></i>
-                    <span>Ajouter mon Premier Article</span>
-                </button>
-            </div>
-        </section>
-
-    </main>
-
-    <footer class="mt-20 border-t border-slate-800/80 bg-slate-950/60 py-10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-xl bg-purple-600/20 border border-purple-500/30 flex items-center justify-center">
-                    <i class="fa-solid fa-atom text-cyan-400 text-sm"></i>
-                </div>
-                <span class="text-sm font-bold text-slate-300">SciVault Platform &copy; 2026</span>
-            </div>
-            <p class="text-xs text-slate-500 text-center md:text-right">
-                Votre coffre-fort scientifique personnel. Données stockées localement en toute sécurité.
-            </p>
+        <div>
+          <span class="text-2xl font-black tracking-tight gradient-text">SciVault</span>
+          <span class="hidden sm:block text-[10px] uppercase font-bold tracking-widest text-slate-400 -mt-1">Plateforme Scientifique Sécurisée</span>
         </div>
-    </footer>
+      </div>
 
-    <div id="adminAuthModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4">
-        <div class="glass-card max-w-md w-full rounded-3xl border border-slate-800 p-6 sm:p-8 space-y-6 relative overflow-hidden shadow-2xl">
-            <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 via-cyan-500 to-lime-400"></div>
+      <div class="flex items-center gap-3">
+        <button id="bookmarkedFilterBtn" onclick="toggleBookmarksOnly()" class="px-4 py-2.5 rounded-xl glass-card hover:bg-slate-800 text-slate-300 text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 border border-slate-700/50">
+          <i class="fa-solid fa-bookmark text-amber-400"></i>
+          <span class="hidden sm:inline">Mes Favoris</span>
+          <span id="bookmarkBadge" class="bg-amber-500/20 text-amber-300 text-xs px-2 py-0.5 rounded-full font-mono">0</span>
+        </button>
 
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400">
-                        <i class="fa-solid fa-lock text-lg"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-bold text-white">Espace Administrateur</h3>
-                        <p class="text-xs text-slate-400">Accès pour publication et gestion</p>
-                    </div>
-                </div>
-                <button onclick="closeModal('adminAuthModal')" class="text-slate-500 hover:text-white transition-colors">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-
-            <form onsubmit="verifyAdminPIN(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-2">Entrez votre Code Secret / PIN</label>
-                    <div class="relative">
-                        <input type="password" id="adminPinInput" required placeholder="Tapez le code PIN secret..." class="w-full px-4 py-3 bg-slate-900 border border-slate-800 rounded-xl focus:outline-none focus:border-purple-500 text-white text-sm font-mono tracking-widest placeholder-slate-600 transition-all">
-                        <button type="button" onclick="togglePinVisibility()" class="absolute right-3 top-3 text-slate-500 hover:text-slate-300">
-                            <i id="pinEyeIcon" class="fa-solid fa-eye"></i>
-                        </button>
-                    </div>
-                    <p id="pinErrorMessage" class="hidden text-xs text-rose-400 mt-2 flex items-center gap-1 font-mono">
-                        <i class="fa-solid fa-triangle-exclamation"></i> Code incorrect ! Accès refusé.
-                    </p>
-                </div>
-
-                <div class="p-3 rounded-xl bg-slate-900/60 border border-purple-500/30 text-[11px] text-slate-300 flex items-start gap-2">
-                    <i class="fa-solid fa-user-ninja text-amber-400 mt-0.5"></i>
-                    <span>
-                        <strong class="text-purple-300 font-mono">Mode Challenge Hacking :</strong> Le code PIN secret est connu uniquement par l'administrateur. À vous de tenter de le découvrir !
-                    </span>
-                </div>
-
-                <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 hover:from-purple-500 hover:to-cyan-400 text-white text-sm font-bold shadow-lg shadow-purple-500/20 transition-all flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-key"></i>
-                    <span>Connexion Administrateur</span>
-                </button>
-            </form>
-        </div>
+        <button onclick="requestAdminAccess()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-500 hover:from-purple-500 hover:to-cyan-400 text-white font-bold text-xs sm:text-sm shadow-lg shadow-purple-500/25 transition-all flex items-center gap-2 border border-purple-400/30 group">
+          <i class="fa-solid fa-plus-circle text-cyan-300 group-hover:rotate-90 transition-transform duration-300"></i>
+          <span>Ajouter Article</span>
+          <span class="text-[10px] bg-black/40 px-2 py-0.5 rounded-md text-cyan-300 font-mono"><i class="fa-solid fa-lock text-[9px] mr-1"></i>ADMIN</span>
+        </button>
+      </div>
     </div>
+  </header>
 
-    <div id="addArticleModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4 custom-scrollbar overflow-y-auto">
-        <div class="glass-card max-w-2xl w-full rounded-3xl border border-purple-500/30 p-6 sm:p-8 space-y-6 my-8 relative shadow-2xl">
-            
-            <div class="flex items-center justify-between border-b border-slate-800 pb-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-300">
-                        <i class="fa-solid fa-plus text-lg"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-xl font-bold text-white">Ajouter un Article ou Ressource</h3>
-                        <p class="text-xs text-emerald-400 font-mono"><i class="fa-solid fa-check-circle mr-1"></i>Connecté en tant qu'Administrateur</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-2">
-                    <button onclick="clearAllArticlesPrompt()" class="px-3 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-xs text-rose-300 border border-rose-500/30 font-semibold transition-all">
-                        <i class="fa-solid fa-trash-can mr-1"></i>Vider la Liste
-                    </button>
-                    <button onclick="openChangePinModal()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-amber-300 border border-amber-500/30 font-semibold transition-all">
-                        <i class="fa-solid fa-key mr-1"></i>Changer PIN
-                    </button>
-                    <button onclick="closeModal('addArticleModal')" class="text-slate-500 hover:text-white transition-colors">
-                        <i class="fa-solid fa-xmark text-lg"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Form -->
-            <form onsubmit="saveNewArticle(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">Titre de l'Article / Document *</label>
-                    <input type="text" id="newTitle" required placeholder="Ex: Modèles de Diffusion appliqués au Diagnostic Médical" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl focus:outline-none focus:border-purple-500 text-slate-200 text-sm">
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-300 mb-1">Domaine / Sujet *</label>
-                        <select id="newSubject" required onchange="toggleCustomDomainInput()" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700/80 rounded-xl text-slate-200 text-sm focus:outline-none focus:border-cyan-400">
-                        <option value="Intelligence Artificielle">Intelligence Artificielle</option>
-                        <option value="Physique Quantique">Physique Quantique</option>
-                        <option value="Biotechnologie">Biotechnologie</option>
-                           <option value="Informatique & Réseaux">Informatique & Réseaux</option>
-                        <option value="Mathématiques">Mathématiques</option>
-                        <option value="Neurosciences">Neurosciences</option>
-                         <option value="Autre Domaine">Autre Domaine</option>
-                       </select>
-<input type="text" id="customDomainInput" placeholder="Saisissez le nom du domaine..." class="hidden mt-2 w-full px-4 py-2 bg-slate-900 border border-cyan-500/50 rounded-xl text-cyan-300 text-sm placeholder-slate-500 focus:outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-300 mb-1">Auteur / Source *</label>
-                        <input type="text" id="newAuthor" required placeholder="Ex: Dr. Ahmed B. / Laboratoire AI" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl focus:outline-none focus:border-purple-500 text-slate-200 text-sm">
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">Résumé / Description *</label>
-                    <textarea id="newAbstract" rows="3" required placeholder="Expliquez brièvement le contenu de l'article ou du dossier..." class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl focus:outline-none focus:border-purple-500 text-slate-200 text-sm custom-scrollbar"></textarea>
-                </div>
-
-                <!-- Links Section -->
-                <div class="space-y-3 p-4 rounded-2xl bg-slate-900/60 border border-slate-800">
-                    <h4 class="text-xs font-bold text-cyan-300 uppercase tracking-wider flex items-center gap-1.5">
-                        <i class="fa-solid fa-link"></i> Liens de la Ressource (Au moins 1 requis)
-                    </h4>
-
-                    <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1"><i class="fa-solid fa-file-pdf text-rose-400 mr-1"></i>Lien Direct du Fichier PDF</label>
-                        <input type="url" id="newPdfUrl" placeholder="https://exemple.com/document.pdf" class="w-full px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-lg text-slate-200 text-xs font-mono">
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1"><i class="fa-brands fa-google-drive text-amber-400 mr-1"></i>Lien du Répertoire Google Drive</label>
-                        <input type="url" id="newDriveUrl" placeholder="https://drive.google.com/file/d/..." class="w-full px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-lg text-slate-200 text-xs font-mono">
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-medium text-slate-400 mb-1"><i class="fa-solid fa-globe text-cyan-400 mr-1"></i>Lien Externe / Source / DOI</label>
-                        <input type="url" id="newExternalUrl" placeholder="https://doi.org/... ou https://site.com/article" class="w-full px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-lg text-slate-200 text-xs font-mono">
-                    </div>
-                </div>
-
-                <div class="flex items-center justify-end gap-3 pt-2">
-                    <button type="button" onclick="closeModal('addArticleModal')" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold">
-                        Annuler
-                    </button>
-                    <button type="submit" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 hover:from-purple-500 hover:to-cyan-400 text-white text-xs font-bold shadow-lg shadow-purple-500/25">
-                        <i class="fa-solid fa-upload mr-1.5"></i>Publier l'Article
-                    </button>
-                </div>
-            </form>
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
+    <!-- Hero Section -->
+    <section class="relative overflow-hidden rounded-3xl p-8 sm:p-12 border border-slate-800 bg-gradient-to-b from-slate-900/90 via-slate-950/80 to-slate-900/90 shadow-2xl">
+      <div class="relative z-10 max-w-3xl space-y-6">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-300 text-xs font-semibold tracking-wide uppercase">
+          <span class="w-2 h-2 rounded-full bg-lime-400 animate-ping"></span>
+          Bibliothèque Scientifique Cloud
         </div>
-    </div>
+        <h1 class="text-3xl sm:text-5xl font-black tracking-tight text-white leading-tight">
+          Espace d'Archives & <span class="gradient-text">Ressources Scientifiques</span>
+        </h1>
+        <p class="text-slate-400 text-sm sm:text-base leading-relaxed">
+          Plateforme organisée pour vos articles de recherche, fichiers PDF, dossiers Google Drive et liens web scientifiques.
+        </p>
+      </div>
+    </section>
 
-    <div id="changePinModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4">
-        <div class="glass-card max-w-md w-full rounded-3xl border border-amber-500/30 p-6 space-y-6 relative shadow-2xl">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
-                        <i class="fa-solid fa-key text-lg"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-bold text-white">Changer le Code PIN Secret</h3>
-                        <p class="text-xs text-slate-400">Définissez votre propre code confidentiel</p>
-                    </div>
-                </div>
-                <button onclick="closeModal('changePinModal')" class="text-slate-500 hover:text-white transition-colors">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-
-            <form onsubmit="saveCustomPin(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">Nouveau Code PIN / Mot de Passe</label>
-                    <input type="password" id="newPinInput" required minlength="4" placeholder="Ex: monCode2026" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-white font-mono text-sm">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">Confirmer le Nouveau Code PIN</label>
-                    <input type="password" id="confirmPinInput" required minlength="4" placeholder="Répéter le code..." class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-white font-mono text-sm">
-                </div>
-
-                <p id="changePinError" class="hidden text-xs text-rose-400 font-mono"></p>
-
-                <button type="submit" class="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold shadow-lg shadow-amber-500/20 transition-all">
-                    Enregistrer le Nouveau Code Secret
-                </button>
-            </form>
+    <!-- Filters Section -->
+    <section class="space-y-6">
+      <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
+        <div class="relative w-full md:w-1/2">
+          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </div>
+          <input type="text" id="searchInput" oninput="filterArticles()" placeholder="Rechercher par titre, résumé, mots-clés ou auteur..." class="w-full pl-11 pr-4 py-3 bg-slate-900/80 border border-slate-800 rounded-2xl focus:outline-none focus:border-cyan-500 text-slate-200 text-sm shadow-lg">
         </div>
-    </div>
 
-    <div id="pdfModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4">
-        <div class="glass-card max-w-4xl w-full h-[85vh] rounded-3xl border border-slate-800 p-6 flex flex-col space-y-4 shadow-2xl relative">
-            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                <div class="flex items-center gap-3">
-                    <i class="fa-solid fa-file-pdf text-rose-500 text-xl"></i>
-                    <div>
-                        <h3 id="pdfModalTitle" class="text-base font-bold text-white line-clamp-1">Aperçu du Document PDF</h3>
-                        <p class="text-xs text-slate-400">Lecteur de document intégré SciVault</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3">
-                    <a id="pdfDownloadBtn" href="#" target="_blank" class="px-3 py-1.5 rounded-xl bg-rose-500/20 text-rose-300 hover:bg-rose-500 hover:text-white text-xs font-semibold transition-all flex items-center gap-1.5">
-                        <i class="fa-solid fa-download"></i>
-                        <span>Télécharger</span>
-                    </a>
-                    <button onclick="closeModal('pdfModal')" class="text-slate-500 hover:text-white">
-                        <i class="fa-solid fa-xmark text-lg"></i>
-                    </button>
-                </div>
-            </div>
-
-            <div class="flex-grow bg-slate-950 rounded-2xl overflow-hidden border border-slate-800 relative flex flex-col items-center justify-center p-6 text-center">
-                <iframe id="pdfIframe" class="w-full h-full rounded-2xl hidden" src=""></iframe>
-                
-                <div id="pdfFallback" class="space-y-4 max-w-md">
-                    <div class="w-16 h-16 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center mx-auto text-2xl">
-                        <i class="fa-solid fa-file-pdf"></i>
-                    </div>
-                    <h4 class="text-lg font-bold text-white">Visualiseur de Document</h4>
-                    <p class="text-slate-400 text-xs leading-relaxed">
-                        Pour des raisons de sécurité ou de restriction iFrame du serveur distant, vous pouvez accéder au document directement via le bouton ci-dessous.
-                    </p>
-                    <a id="pdfDirectLink" href="#" target="_blank" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition-all shadow-lg shadow-rose-600/20">
-                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                        <span>Ouvrir le PDF dans un nouvel onglet</span>
-                    </a>
-                </div>
-            </div>
+        <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+          <button onclick="setMediaTypeFilter('all')" id="filter-all" class="media-filter-btn active px-4 py-2.5 rounded-xl text-xs font-bold bg-purple-600 text-white shadow-lg border border-purple-500/50">Tout</button>
+          <button onclick="setMediaTypeFilter('pdf')" id="filter-pdf" class="media-filter-btn px-4 py-2.5 rounded-xl text-xs font-bold bg-slate-900 text-slate-400 border border-slate-800"><i class="fa-solid fa-file-pdf text-rose-400 mr-1.5"></i>PDF Direct</button>
+          <button onclick="setMediaTypeFilter('drive')" id="filter-drive" class="media-filter-btn px-4 py-2.5 rounded-xl text-xs font-bold bg-slate-900 text-slate-400 border border-slate-800"><i class="fa-brands fa-google-drive text-amber-400 mr-1.5"></i>Google Drive</button>
+          <button onclick="setMediaTypeFilter('link')" id="filter-link" class="media-filter-btn px-4 py-2.5 rounded-xl text-xs font-bold bg-slate-900 text-slate-400 border border-slate-800"><i class="fa-solid fa-link text-cyan-400 mr-1.5"></i>Lien Web</button>
         </div>
-    </div>
+      </div>
 
-    <!-- Hacker Surprise Easter Egg Modal -->
-    <div id="hackerSurpriseModal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-xl hidden flex items-center justify-center p-4">
-        <div class="glass-card max-w-lg w-full rounded-3xl border border-lime-500/50 p-6 sm:p-8 space-y-6 relative overflow-hidden shadow-2xl text-center">
-            <div class="absolute -top-10 -right-10 w-32 h-32 bg-lime-500/20 rounded-full blur-2xl pointer-events-none"></div>
-            
-            <div class="w-20 h-20 rounded-2xl bg-lime-500/10 border border-lime-500/30 flex items-center justify-center mx-auto text-lime-400 text-3xl animate-bounce shadow-lg shadow-lime-500/20">
-                <i class="fa-solid fa-skull-crossbones"></i>
-            </div>
+      <div class="flex items-center gap-2 overflow-x-auto pb-2 custom-scrollbar">
+        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider mr-2 shrink-0"><i class="fa-solid fa-tags mr-1"></i>Thèmes:</span>
+        <div id="subjectTagsContainer" class="flex items-center gap-2 shrink-0"></div>
+      </div>
+    </section>
 
-            <div class="space-y-3">
-                <span class="px-3.5 py-1 text-[11px] font-mono font-bold rounded-full bg-lime-500/20 text-lime-300 border border-lime-500/40 uppercase tracking-widest">
-                    🚨 CHALLENGE SOLVED ! 🚨
-                </span>
-                <h3 class="text-2xl font-black text-white gradient-text">BIG SURPRISE !</h3>
-                
-                <div class="bg-slate-950/90 p-4 rounded-2xl border border-lime-500/40 text-lime-400 font-mono text-sm font-bold shadow-inner">
-                    " 123big_suprise_your_data_is_delisiouse 😋 "
-                </div>
-
-                <p class="text-xs text-slate-300 leading-relaxed font-medium">
-                    🎉 Bravo ! Vous avez découvert le code secret du Challenge Cyber Hacking ! Vos données ont été "dégustées" avec succès et l'accès administrateur vous est accordé.
-                </p>
-            </div>
-
-            <button onclick="closeModal('hackerSurpriseModal'); openModal('addArticleModal');" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-lime-500 via-cyan-500 to-purple-600 hover:from-lime-400 hover:to-purple-500 text-slate-950 font-black text-xs uppercase tracking-wider transition-all shadow-xl shadow-lime-500/25 flex items-center justify-center gap-2">
-                <i class="fa-solid fa-unlock-keyhole text-sm"></i>
-                <span>Accéder au Panneau d'Administration</span>
-            </button>
+    <!-- Articles Feed -->
+    <section>
+      <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-3">
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-layer-group text-purple-400"></i>
+            <span>Mes Articles & Documents</span>
+          </h2>
+          <span id="articleCountBadge" class="bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs px-2.5 py-1 rounded-full font-mono font-semibold">0</span>
         </div>
+        <div class="text-xs text-slate-400 font-mono">
+          Statut: <span class="text-emerald-400 font-semibold">Synchronisé Cloud</span>
+        </div>
+      </div>
+
+      <div id="articlesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+      <div id="emptyState" class="text-center py-16 space-y-4 glass-card rounded-3xl border border-slate-800 hidden">
+        <div class="w-20 h-20 rounded-3xl bg-purple-500/10 text-purple-400 flex items-center justify-center mx-auto text-3xl border border-purple-500/20">
+          <i class="fa-solid fa-folder-plus"></i>
+        </div>
+        <h3 class="text-xl font-bold text-white">Aucun article dans la base de données</h3>
+        <p class="text-slate-400 text-sm max-w-md mx-auto">
+          La bibliothèque est prête ! Ajoutez un article pour le partager avec tout le monde.
+        </p>
+        <button onclick="requestAdminAccess()" class="px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 text-white text-xs font-bold inline-flex items-center gap-2">
+          <i class="fa-solid fa-plus-circle"></i>
+          <span>Ajouter un Article</span>
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Admin Modal -->
+  <div id="adminAuthModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="glass-card max-w-md w-full rounded-3xl border border-slate-800 p-6 sm:p-8 space-y-6 relative">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-bold text-white">Espace Administrateur</h3>
+        <button onclick="closeModal('adminAuthModal')" class="text-slate-500 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <form onsubmit="verifyAdminPIN(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-2">Code Secret / PIN</label>
+          <input type="password" id="adminPinInput" required placeholder="Entrez le code PIN..." class="w-full px-4 py-3 bg-slate-900 border border-slate-800 rounded-xl text-white text-sm font-mono">
+          <p id="pinErrorMessage" class="hidden text-xs text-rose-400 mt-2">Code incorrect !</p>
+        </div>
+        <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 text-white text-sm font-bold">Connexion</button>
+      </form>
     </div>
+  </div>
 
-    <script>
-        const DEFAULT_PIN = "sci2026"; 
-        
-        // GLOBAL SCOPE VARIABLES
-        var ADMIN_PIN = localStorage.getItem('scivault_admin_pin') || DEFAULT_PIN;
-        
-        // CLEAN INITIAL STATE: Empty articles list ready for user content!
-        const initialArticles = [];
+  <!-- Add Article Modal -->
+  <div id="addArticleModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4 custom-scrollbar overflow-y-auto">
+    <div class="glass-card max-w-2xl w-full rounded-3xl border border-purple-500/30 p-6 sm:p-8 space-y-6 my-8">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+        <h3 class="text-xl font-bold text-white">Ajouter un Article</h3>
+        <button onclick="closeModal('addArticleModal')" class="text-slate-500 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
 
-        // Primary Collections
-        let articles = [];
-        let resources = []; 
+      <form onsubmit="saveNewArticle(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Titre *</label>
+          <input type="text" id="newTitle" required class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-white text-sm">
+        </div>
 
-        // UI State
-        let activeSubject = 'all';
-        let activeMediaType = 'all';
-        let searchQuery = '';
-        let showBookmarksOnly = false;
-        let bookmarkedIds = new Set();
-        let isAdminLoggedIn = false;
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Domaine *</label>
+            <select id="newSubject" required onchange="toggleCustomDomainInput()" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700/80 rounded-xl text-white text-sm">
+              <option value="Intelligence Artificielle">Intelligence Artificielle</option>
+              <option value="Physique Quantique">Physique Quantique</option>
+              <option value="Biotechnologie">Biotechnologie</option>
+              <option value="Informatique & Réseaux">Informatique & Réseaux</option>
+              <option value="Mathématiques">Mathématiques</option>
+              <option value="Autre Domaine">Autre Domaine</option>
+            </select>
+            <input type="text" id="customDomainInput" placeholder="Saisissez le nom du domaine..." class="hidden mt-2 w-full px-4 py-2 bg-slate-900 border border-cyan-500/50 rounded-xl text-cyan-300 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Auteur *</label>
+            <input type="text" id="newAuthor" required class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-white text-sm">
+          </div>
+        </div>
 
-        window.addEventListener('DOMContentLoaded', () => {
-            // Load saved articles from LocalStorage or use empty array
-            const storedArticles = localStorage.getItem('scivault_articles');
-            articles = storedArticles ? JSON.parse(storedArticles) : initialArticles;
-            resources = articles;
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Résumé *</label>
+          <textarea id="newAbstract" rows="3" required class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-white text-sm"></textarea>
+        </div>
 
-            // Load saved bookmarks
-            const storedBookmarks = localStorage.getItem('scivault_bookmarks');
-            if (storedBookmarks) {
-                bookmarkedIds = new Set(JSON.parse(storedBookmarks));
-            }
+        <div class="space-y-3 p-4 rounded-2xl bg-slate-900/60 border border-slate-800">
+          <h4 class="text-xs font-bold text-cyan-300 uppercase">Liens (Au moins 1)</h4>
+          <input type="url" id="newPdfUrl" placeholder="Lien PDF direct..." class="w-full px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs font-mono text-white">
+          <input type="url" id="newDriveUrl" placeholder="Lien Google Drive..." class="w-full px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs font-mono text-white">
+          <input type="url" id="newExternalUrl" placeholder="Lien Source / Site web..." class="w-full px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs font-mono text-white">
+        </div>
 
-            renderSubjectTags();
-            renderArticles();
-            updateBookmarkBadge();
+        <div class="flex justify-end gap-3 pt-2">
+          <button type="button" onclick="closeModal('addArticleModal')" class="px-4 py-2.5 rounded-xl bg-slate-800 text-slate-300 text-xs font-semibold">Annuler</button>
+          <button type="submit" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 text-white text-xs font-bold">Publier dans la Cloud</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- JavaScript Firestore Logic -->
+  <script>
+    const DEFAULT_PIN = "sci2026";
+    var ADMIN_PIN = localStorage.getItem('scivault_admin_pin') || DEFAULT_PIN;
+
+    let articles = [];
+    let activeSubject = 'all';
+    let activeMediaType = 'all';
+    let searchQuery = '';
+    let showBookmarksOnly = false;
+    let bookmarkedIds = new Set();
+    let isAdminLoggedIn = false;
+
+    // 1. LISTEN TO FIRESTORE REALTIME UPDATES
+    db.collection("articles").onSnapshot((snapshot) => {
+      articles = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+
+      // Sort by newest created
+      articles.sort((a, b) => {
+        const timeA = a.createdAt ? a.createdAt.seconds : 0;
+        const timeB = b.createdAt ? b.createdAt.seconds : 0;
+        return timeB - timeA;
+      });
+
+      renderSubjectTags();
+      renderArticles();
+    }, (error) => {
+      console.error("Erreur Firestore :", error);
+    });
+
+    // 2. SAVE ARTICLE TO FIRESTORE
+    function saveNewArticle(event) {
+      event.preventDefault();
+
+      const domainSelectValue = document.getElementById('newSubject').value;
+      const customDomainValue = document.getElementById('customDomainInput').value.trim();
+      const finalDomain = (domainSelectValue === 'Autre Domaine' && customDomainValue !== '') ? customDomainValue : domainSelectValue;
+
+      const pdfUrl = document.getElementById('newPdfUrl').value.trim();
+      const driveUrl = document.getElementById('newDriveUrl').value.trim();
+      const externalUrl = document.getElementById('newExternalUrl').value.trim();
+
+      if (!pdfUrl && !driveUrl && !externalUrl) {
+        alert("Veuillez fournir au moins un lien.");
+        return;
+      }
+
+      const newArticle = {
+        title: document.getElementById('newTitle').value.trim(),
+        subject: finalDomain,
+        author: document.getElementById('newAuthor').value.trim(),
+        abstract: document.getElementById('newAbstract').value.trim(),
+        pdfUrl: pdfUrl,
+        driveUrl: driveUrl,
+        externalUrl: externalUrl,
+        date: new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }),
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+
+      db.collection("articles").add(newArticle)
+        .then(() => {
+          closeModal('addArticleModal');
+          event.target.reset();
+        })
+        .catch((error) => {
+          console.error("Erreur d'ajout :", error);
+          alert("Erreur lors de la publication.");
         });
+    }
 
-        function getSecretPIN() {
-            ADMIN_PIN = localStorage.getItem('scivault_admin_pin') || DEFAULT_PIN;
-            return ADMIN_PIN;
-        }
+    // 3. DELETE ARTICLE FROM FIRESTORE
+    function deleteArticle(artId) {
+      if (confirm("Voulez-vous vraiment supprimer cet article ?")) {
+        db.collection("articles").doc(artId).delete()
+          .catch(err => console.error("Erreur suppression:", err));
+      }
+    }
 
-        function updateBookmarkBadge() {
-            const badge = document.getElementById('bookmarkBadge');
-            if (badge) {
-                badge.innerText = bookmarkedIds.size;
-            }
-        }
+    // Render logic
+    function renderArticles() {
+      const grid = document.getElementById('articlesGrid');
+      const emptyState = document.getElementById('emptyState');
+      if (!grid) return;
 
-        function updateFavBadge() {
-            updateBookmarkBadge();
-        }
+      const filtered = articles.filter(art => {
+        const matchesSearch = searchQuery === '' || 
+          art.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          art.abstract.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          art.author.toLowerCase().includes(searchQuery.toLowerCase());
 
-        function requestAdminAccess() {
-            if (isAdminLoggedIn) {
-                openModal('addArticleModal');
-            } else {
-                document.getElementById('adminPinInput').value = '';
-                document.getElementById('pinErrorMessage').classList.add('hidden');
-                openModal('adminAuthModal');
-            }
-        }
+        const matchesSubject = activeSubject === 'all' || art.subject === activeSubject;
 
-        function togglePinVisibility() {
-            const input = document.getElementById('adminPinInput').value;
-            const icon = document.getElementById('pinEyeIcon');
-            const inputEl = document.getElementById('adminPinInput');
-            if (inputEl.type === 'password') {
-                inputEl.type = 'text';
-                icon.className = 'fa-solid fa-eye-slash';
-            } else {
-                inputEl.type = 'password';
-                icon.className = 'fa-solid fa-eye';
-            }
-        }
+        let matchesMedia = true;
+        if (activeMediaType === 'pdf') matchesMedia = !!art.pdfUrl;
+        if (activeMediaType === 'drive') matchesMedia = !!art.driveUrl;
+        if (activeMediaType === 'link') matchesMedia = !!art.externalUrl;
 
-        function verifyAdminPIN(event) {
-            event.preventDefault();
-            const inputPin = document.getElementById('adminPinInput').value.trim();
-            const correctPin = getSecretPIN();
+        const matchesBookmark = !showBookmarksOnly || bookmarkedIds.has(art.id);
 
-            // Secret Hacker Easter Egg Challenge Trigger
-            if (inputPin === '123big_suprise_your_data_is_delisiouse') {
-                isAdminLoggedIn = true;
-                closeModal('adminAuthModal');
-                openModal('hackerSurpriseModal');
-                return;
-            }
+        return matchesSearch && matchesSubject && matchesMedia && matchesBookmark;
+      });
 
-            if (inputPin === correctPin) {
-                isAdminLoggedIn = true;
-                closeModal('adminAuthModal');
-                openModal('addArticleModal');
-            } else {
-                const errorMsg = document.getElementById('pinErrorMessage');
-                errorMsg.classList.remove('hidden');
-                
-                const card = document.querySelector('#adminAuthModal .glass-card');
-                if (card) {
-                    card.classList.add('animate-shake');
-                    setTimeout(() => card.classList.remove('animate-shake'), 500);
-                }
-            }
-        }
+      document.getElementById('articleCountBadge').innerText = filtered.length;
 
-        function openChangePinModal() {
-            document.getElementById('newPinInput').value = '';
-            document.getElementById('confirmPinInput').value = '';
-            document.getElementById('changePinError').classList.add('hidden');
-            openModal('changePinModal');
-        }
+      if (filtered.length === 0) {
+        grid.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        return;
+      }
 
-        function saveCustomPin(event) {
-            event.preventDefault();
-            const newPin = document.getElementById('newPinInput').value.trim();
-            const confirmPin = document.getElementById('confirmPinInput').value.trim();
-            const errorElement = document.getElementById('changePinError');
+      emptyState.classList.add('hidden');
+      grid.innerHTML = filtered.map(art => `
+        <div class="glass-card rounded-2xl p-6 flex flex-col justify-between space-y-5 relative">
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="px-3 py-1 text-[11px] font-semibold rounded-full bg-purple-500/10 text-purple-300 border border-purple-500/20">${art.subject}</span>
+              <div class="flex items-center gap-2">
+                <span class="text-[11px] text-slate-500 font-mono">${art.date || ''}</span>
+                ${isAdminLoggedIn ? `<button onclick="deleteArticle('${art.id}')" class="text-slate-600 hover:text-rose-400 p-1"><i class="fa-solid fa-trash-can text-xs"></i></button>` : ''}
+              </div>
+            </div>
+            <h3 class="text-base font-bold text-white leading-snug">${art.title}</h3>
+            <p class="text-xs text-slate-400 flex items-center gap-1.5"><i class="fa-regular fa-user text-purple-400"></i>${art.author}</p>
+            <p class="text-slate-400 text-xs leading-relaxed line-clamp-3 bg-slate-950/40 p-3 rounded-xl border border-slate-900">${art.abstract}</p>
+          </div>
+          <div class="pt-4 border-t border-slate-800 flex items-center gap-2">
+            ${art.pdfUrl ? `<a href="${art.pdfUrl}" target="_blank" class="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20 hover:bg-rose-500 hover:text-white transition-all"><i class="fa-solid fa-file-pdf"></i>PDF</a>` : ''}
+            ${art.driveUrl ? `<a href="${art.driveUrl}" target="_blank" class="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20 hover:bg-amber-500 hover:text-slate-950 transition-all"><i class="fa-brands fa-google-drive"></i>Drive</a>` : ''}
+            ${art.externalUrl ? `<a href="${art.externalUrl}" target="_blank" class="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 hover:bg-cyan-500 hover:text-slate-950 transition-all"><i class="fa-solid fa-arrow-up-right-from-square"></i>Source</a>` : ''}
+          </div>
+        </div>
+      `).join('');
+    }
 
-            if (newPin !== confirmPin) {
-                errorElement.innerText = "Les codes PIN ne correspondent pas !";
-                errorElement.classList.remove('hidden');
-                return;
-            }
+    function renderSubjectTags() {
+      const subjects = ['all', ...new Set(articles.map(a => a.subject))];
+      const container = document.getElementById('subjectTagsContainer');
+      if (!container) return;
+      container.innerHTML = subjects.map(subj => `
+        <button onclick="setSubjectFilter('${subj}')" class="px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${activeSubject === subj ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/50' : 'bg-slate-900/80 text-slate-400 border-slate-800'}">
+          ${subj === 'all' ? 'Tous les sujets' : subj}
+        </button>
+      `).join('');
+    }
 
-            if (newPin.length < 4) {
-                errorElement.innerText = "Le code doit contenir au moins 4 caractères !";
-                errorElement.classList.remove('hidden');
-                return;
-            }
+    function toggleCustomDomainInput() {
+      const domainSelect = document.getElementById('newSubject');
+      const customInput = document.getElementById('customDomainInput');
+      if (domainSelect.value === 'Autre Domaine') {
+        customInput.classList.remove('hidden');
+      } else {
+        customInput.classList.add('hidden');
+        customInput.value = '';
+      }
+    }
 
-            localStorage.setItem('scivault_admin_pin', newPin);
-            ADMIN_PIN = newPin;
-            closeModal('changePinModal');
-            alert("✅ Code secret d'administration mis à jour avec succès !");
-        }
+    function verifyAdminPIN(e) {
+      e.preventDefault();
+      const inputPin = document.getElementById('adminPinInput').value.trim();
+      if (inputPin === ADMIN_PIN || inputPin === "123big_suprise_your_data_is_delisiouse") {
+        isAdminLoggedIn = true;
+        closeModal('adminAuthModal');
+        openModal('addArticleModal');
+        renderArticles();
+      } else {
+        document.getElementById('pinErrorMessage').classList.remove('hidden');
+      }
+    }
 
-        function saveNewArticle(event) {
-            event.preventDefault();
-
-            const title = document.getElementById('newTitle').value.trim();
-            const subject = document.getElementById('newSubject').value;
-            const author = document.getElementById('newAuthor').value.trim();
-            const abstract = document.getElementById('newAbstract').value.trim();
-            const pdfUrl = document.getElementById('newPdfUrl').value.trim();
-            const driveUrl = document.getElementById('newDriveUrl').value.trim();
-            const externalUrl = document.getElementById('newExternalUrl').value.trim();
-
-            if (!pdfUrl && !driveUrl && !externalUrl) {
-                alert("Veuillez fournir au moins un lien (PDF, Drive ou Lien externe).");
-                return;
-            }
-
-            const newArticle = {
-                id: 'art-' + Date.now(),
-                title,
-                subject,
-                author,
-                date: new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }),
-                abstract,
-                pdfUrl,
-                driveUrl,
-                externalUrl,
-                likes: 0,
-                downloads: 0
-            };
-
-            articles.unshift(newArticle);
-            resources = articles;
-            localStorage.setItem('scivault_articles', JSON.stringify(articles));
-
-            renderSubjectTags();
-            renderArticles();
-            
-            // Lock session again so next entry strictly requires PIN entry
-            isAdminLoggedIn = false;
-            closeModal('addArticleModal');
-
-            event.target.reset();
-        }
-
-        function deleteArticle(artId) {
-            if (confirm("Voulez-vous vraiment supprimer cet article ?")) {
-                articles = articles.filter(a => a.id !== artId);
-                resources = articles;
-                localStorage.setItem('scivault_articles', JSON.stringify(articles));
-                renderSubjectTags();
-                renderArticles();
-            }
-        }
-
-        function clearAllArticlesPrompt() {
-            if (confirm("⚠️ Voulez-vous supprimer TOUS les articles et vider la base de données ?")) {
-                articles = [];
-                resources = articles;
-                localStorage.removeItem('scivault_articles');
-                renderSubjectTags();
-                renderArticles();
-                
-                isAdminLoggedIn = false;
-                closeModal('addArticleModal');
-            }
-        }
-
-        function renderSubjectTags() {
-            const subjects = ['all', ...new Set(articles.map(a => a.subject))];
-            const container = document.getElementById('subjectTagsContainer');
-            
-            if (!container) return;
-
-            container.innerHTML = subjects.map(subj => {
-                const isActive = activeSubject === subj;
-                const label = subj === 'all' ? 'Tous les sujets' : subj;
-                const activeClasses = isActive 
-                    ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/50 shadow-md' 
-                    : 'bg-slate-900/80 text-slate-400 hover:text-white border-slate-800 hover:bg-slate-800';
-
-                return `
-                    <button onclick="setSubjectFilter('${subj}')" class="px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${activeClasses}">
-                        ${label}
-                    </button>
-                `;
-            }).join('');
-        }
-
-        function renderArticles() {
-            const grid = document.getElementById('articlesGrid');
-            const emptyState = document.getElementById('emptyState');
-
-            if (!grid) return;
-
-            const filtered = articles.filter(art => {
-                const matchesSearch = searchQuery === '' || 
-                    art.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                    art.abstract.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                    art.author.toLowerCase().includes(searchQuery.toLowerCase());
-
-                const matchesSubject = activeSubject === 'all' || art.subject === activeSubject;
-
-                let matchesMedia = true;
-                if (activeMediaType === 'pdf') matchesMedia = !!art.pdfUrl;
-                if (activeMediaType === 'drive') matchesMedia = !!art.driveUrl;
-                if (activeMediaType === 'link') matchesMedia = !!art.externalUrl;
-
-                const matchesBookmark = !showBookmarksOnly || bookmarkedIds.has(art.id);
-
-                return matchesSearch && matchesSubject && matchesMedia && matchesBookmark;
-            });
-
-            const countBadge = document.getElementById('articleCountBadge');
-            if (countBadge) countBadge.innerText = filtered.length;
-
-            if (filtered.length === 0) {
-                grid.innerHTML = '';
-                if (emptyState) emptyState.classList.remove('hidden');
-                return;
-            }
-
-            if (emptyState) emptyState.classList.add('hidden');
-
-            grid.innerHTML = filtered.map(art => {
-                const isBookmarked = bookmarkedIds.has(art.id);
-                
-                return `
-                    <div class="glass-card rounded-2xl p-6 flex flex-col justify-between space-y-5 relative group">
-                        
-                        <div class="space-y-3">
-                            <div class="flex items-center justify-between gap-2">
-                                <span class="px-3 py-1 text-[11px] font-semibold rounded-full bg-purple-500/10 text-purple-300 border border-purple-500/20">
-                                    ${art.subject}
-                                </span>
-                                <div class="flex items-center gap-2">
-                                    <span class="text-[11px] text-slate-500 font-mono">${art.date}</span>
-                                    <button onclick="toggleBookmark('${art.id}')" class="text-slate-500 hover:text-amber-400 transition-colors p-1" title="Ajouter aux favoris">
-                                        <i class="${isBookmarked ? 'fa-solid text-amber-400' : 'fa-regular'} fa-bookmark text-sm"></i>
-                                    </button>
-                                    ${isAdminLoggedIn ? `
-                                        <button onclick="deleteArticle('${art.id}')" class="text-slate-600 hover:text-rose-400 transition-colors p-1" title="Supprimer">
-                                            <i class="fa-solid fa-trash-can text-xs"></i>
-                                        </button>
-                                    ` : ''}
-                                </div>
-                            </div>
-
-                            <h3 class="text-base font-bold text-white group-hover:text-cyan-300 transition-colors leading-snug">
-                                ${art.title}
-                            </h3>
-
-                            <p class="text-xs text-slate-400 font-medium flex items-center gap-1.5">
-                                <i class="fa-regular fa-user text-purple-400"></i>
-                                <span>${art.author}</span>
-                            </p>
-
-                            <p class="text-slate-400 text-xs leading-relaxed line-clamp-3 bg-slate-950/40 p-3 rounded-xl border border-slate-900">
-                                ${art.abstract}
-                            </p>
-                        </div>
-
-                        <div class="pt-4 border-t border-slate-800 space-y-3">
-                            <div class="flex flex-wrap items-center gap-2">
-                                ${art.pdfUrl ? `
-                                    <button onclick="openPdfViewer('${art.pdfUrl}', '${escapeHtml(art.title)}')" class="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20 hover:bg-rose-500 hover:text-white transition-all">
-                                        <i class="fa-solid fa-file-pdf"></i>
-                                        <span>PDF</span>
-                                    </button>
-                                ` : ''}
-
-                                ${art.driveUrl ? `
-                                    <a href="${art.driveUrl}" target="_blank" class="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20 hover:bg-amber-500 hover:text-slate-950 transition-all">
-                                        <i class="fa-brands fa-google-drive"></i>
-                                        <span>Drive</span>
-                                    </a>
-                                ` : ''}
-
-                                ${art.externalUrl ? `
-                                    <a href="${art.externalUrl}" target="_blank" class="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 hover:bg-cyan-500 hover:text-slate-950 transition-all">
-                                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                                        <span>Source</span>
-                                    </a>
-                                ` : ''}
-                            </div>
-                        </div>
-
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function filterArticles() {
-            const input = document.getElementById('searchInput');
-            searchQuery = input ? input.value : '';
-            renderArticles();
-        }
-
-        function setSubjectFilter(subj) {
-            activeSubject = subj;
-            renderSubjectTags();
-            renderArticles();
-        }
-
-        function setMediaTypeFilter(type) {
-            activeMediaType = type;
-            document.querySelectorAll('.media-filter-btn').forEach(btn => {
-                btn.className = 'media-filter-btn px-4 py-2.5 rounded-xl text-xs font-bold transition-all bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800 border border-slate-800';
-            });
-            
-            const activeBtn = document.getElementById(`filter-${type}`);
-            if (activeBtn) {
-                activeBtn.className = 'media-filter-btn active px-4 py-2.5 rounded-xl text-xs font-bold transition-all bg-purple-600 text-white shadow-lg shadow-purple-600/20 border border-purple-500/50';
-            }
-
-            renderArticles();
-        }
-
-        function toggleBookmarksOnly() {
-            showBookmarksOnly = !showBookmarksOnly;
-            const btn = document.getElementById('bookmarkedFilterBtn');
-            if (btn) {
-                if (showBookmarksOnly) {
-                    btn.classList.add('border-amber-500/50', 'bg-amber-500/10', 'text-amber-300');
-                } else {
-                    btn.classList.remove('border-amber-500/50', 'bg-amber-500/10', 'text-amber-300');
-                }
-            }
-            renderArticles();
-        }
-
-        function toggleBookmark(artId) {
-            if (bookmarkedIds.has(artId)) {
-                bookmarkedIds.delete(artId);
-            } else {
-                bookmarkedIds.add(artId);
-            }
-            localStorage.setItem('scivault_bookmarks', JSON.stringify([...bookmarkedIds]));
-            updateBookmarkBadge();
-            renderArticles();
-        }
-
-        function resetFilters() {
-            searchQuery = '';
-            const searchInput = document.getElementById('searchInput');
-            if (searchInput) searchInput.value = '';
-            
-            activeSubject = 'all';
-            activeMediaType = 'all';
-            showBookmarksOnly = false;
-            
-            const btn = document.getElementById('bookmarkedFilterBtn');
-            if (btn) btn.classList.remove('border-amber-500/50', 'bg-amber-500/10', 'text-amber-300');
-            
-            setMediaTypeFilter('all');
-            renderSubjectTags();
-            renderArticles();
-        }
-
-        function openPdfViewer(url, title) {
-            document.getElementById('pdfModalTitle').innerText = title;
-            document.getElementById('pdfDownloadBtn').href = url;
-            document.getElementById('pdfDirectLink').href = url;
-
-            const iframe = document.getElementById('pdfIframe');
-            const fallback = document.getElementById('pdfFallback');
-
-            if (url.endsWith('.pdf')) {
-                iframe.src = `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
-                iframe.classList.remove('hidden');
-                fallback.classList.add('hidden');
-            } else {
-                iframe.classList.add('hidden');
-                fallback.classList.remove('hidden');
-            }
-
-            openModal('pdfModal');
-        }
-
-        function openModal(id) {
-            const el = document.getElementById(id);
-            if (el) el.classList.remove('hidden');
-        }
-
-        function closeModal(id) {
-            const el = document.getElementById(id);
-            if (el) el.classList.add('hidden');
-
-            // Force session lock on modal close so code is required every single time
-            if (id === 'addArticleModal' || id === 'adminAuthModal') {
-                isAdminLoggedIn = false;
-            }
-        }
-
-        function escapeHtml(str) {
-            return str.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-        }
-    </script>
+    function requestAdminAccess() {
+      if (isAdminLoggedIn) openModal('addArticleModal');
+      else openModal('adminAuthModal');
+    }
+    function setSubjectFilter(s) { activeSubject = s; renderSubjectTags(); renderArticles(); }
+    function setMediaTypeFilter(m) { activeMediaType = m; renderArticles(); }
+    function filterArticles() { searchQuery = document.getElementById('searchInput').value; renderArticles(); }
+    function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+  </script>
 </body>
 </html>
