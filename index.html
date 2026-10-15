@@ -110,6 +110,52 @@
       background-image: radial-gradient(rgba(124, 58, 237, 0.12) 1px, transparent 0);
       background-size: 32px 32px;
     }
+    
+/* ===== SciVault: Floating Particles ===== */
+#heroParticles {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.scivault-particle {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  background: var(--particle-color);
+  opacity: 0;
+  box-shadow: 0 0 12px var(--particle-color);
+  animation: scivault-float var(--duration) ease-in-out
+    var(--delay) infinite alternate;
+}
+
+@keyframes scivault-float {
+  0% {
+    opacity: 0.12;
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    opacity: 0.65;
+  }
+  100% {
+    opacity: 0.2;
+    transform: translate3d(var(--move-x), var(--move-y), 0);
+  }
+}
+
+/* احترام إعداد تقليل الحركة */
+@media (prefers-reduced-motion: reduce) {
+  .scivault-particle {
+    animation: none;
+    opacity: 0.2;
+  }
+}
+
   </style>
 </head>
 <body class="min-h-screen flex flex-col custom-scrollbar overflow-x-hidden selection:bg-purple-500 selection:text-white grid-bg">
@@ -148,6 +194,7 @@
   <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
     <!-- Hero Section -->
     <section class="relative overflow-hidden rounded-3xl p-8 sm:p-12 border border-slate-800 bg-gradient-to-b from-slate-900/90 via-slate-950/80 to-slate-900/90 shadow-2xl">
+      <div id="heroParticles" aria-hidden="true"></div>
       <div class="relative z-10 max-w-3xl space-y-6">
         <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-300 text-xs font-semibold tracking-wide uppercase">
           <span class="w-2 h-2 rounded-full bg-lime-400 animate-ping"></span>
@@ -544,6 +591,52 @@ async function verifyAdminLogin(e) {
     function filterArticles() { searchQuery = document.getElementById('searchInput').value; renderArticles(); }
     function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
     function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+    
+(function initHeroParticles() {
+  const container = document.getElementById('heroParticles');
+  if (!container) return;
+
+  const reduceMotion = window.matchMedia(
+    '(prefers-reduced-motion: reduce)'
+  ).matches;
+
+  const particleCount = reduceMotion ? 12 : 24;
+  const colors = ['#A855F7', '#06B6D4', '#84CC16'];
+
+  for (let i = 0; i < particleCount; i++) {
+    const particle = document.createElement('span');
+    particle.className = 'scivault-particle';
+
+    const size = 2 + Math.random() * 4;
+
+    particle.style.setProperty('--x', `${Math.random() * 100}%`);
+    particle.style.setProperty('--y', `${Math.random() * 100}%`);
+    particle.style.setProperty('--size', `${size}px`);
+    particle.style.setProperty(
+      '--particle-color',
+      colors[i % colors.length]
+    );
+    particle.style.setProperty(
+      '--duration',
+      `${5 + Math.random() * 7}s`
+    );
+    particle.style.setProperty(
+      '--delay',
+      `${-Math.random() * 10}s`
+    );
+    particle.style.setProperty(
+      '--move-x',
+      `${-18 + Math.random() * 36}px`
+    );
+    particle.style.setProperty(
+      '--move-y',
+      `${-24 + Math.random() * 48}px`
+    );
+
+    container.appendChild(particle);
+  }
+})();
+
   </script>
 </body>
 </html>
