@@ -76,6 +76,7 @@
     const auth = firebase.auth();
     const messaging = firebase.messaging();
     
+
 async function activerNotifications() {
   try {
     if (!("Notification" in window) || !("serviceWorker" in navigator)) {
@@ -91,8 +92,15 @@ async function activerNotifications() {
     }
 
     const registration = await navigator.serviceWorker.register(
-      "./firebase-messaging-sw.js"
+      "./firebase-messaging-sw.js",
+      { scope: "./" }
     );
+
+    await navigator.serviceWorker.ready;
+
+    if (!registration.active) {
+      throw new Error("Le Service Worker n'est pas encore actif. Réessayez.");
+    }
 
     const token = await messaging.getToken({
       vapidKey: "BJnupK9FvJHIu172CqWfUpYhMWMkg8outy3HKT8AzqR8VMpDE3lrBkEOl-kU8m1nWq_ua6x_TTb7WT8kN84HKvs",
@@ -100,8 +108,7 @@ async function activerNotifications() {
     });
 
     if (!token) {
-      alert("Impossible d'activer les notifications.");
-      return;
+      throw new Error("Aucun token de notification n'a été créé.");
     }
 
     await db.collection("pushTokens").add({
@@ -111,7 +118,7 @@ async function activerNotifications() {
 
     alert("Notifications activées !");
   } catch (error) {
-    console.error("Erreur notifications :", error);
+    console.error("Erreur notifications SciVault :", error);
     alert("Erreur : " + error.message);
   }
 }
