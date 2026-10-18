@@ -574,6 +574,50 @@ async function activerNotifications() {
     let searchQuery = '';
     let showBookmarksOnly = false;
     let bookmarkedIds = new Set();
+
+    
+try {
+  bookmarkedIds = new Set(
+    JSON.parse(localStorage.getItem('scivault-bookmarks') || '[]')
+  );
+} catch (error) {
+  bookmarkedIds = new Set();
+}
+
+function toggleBookmark(id) {
+  if (bookmarkedIds.has(id)) {
+    bookmarkedIds.delete(id);
+  } else {
+    bookmarkedIds.add(id);
+  }
+
+  localStorage.setItem(
+    'scivault-bookmarks',
+    JSON.stringify([...bookmarkedIds])
+  );
+
+  updateBookmarkBadge();
+  renderArticles();
+}
+
+function toggleBookmarksOnly() {
+  showBookmarksOnly = !showBookmarksOnly;
+
+  const btn = document.getElementById('bookmarkedFilterBtn');
+  btn.classList.toggle('ring-2', showBookmarksOnly);
+  btn.classList.toggle('ring-amber-400', showBookmarksOnly);
+
+  renderArticles();
+}
+
+function updateBookmarkBadge() {
+  document.getElementById('bookmarkBadge').textContent =
+    bookmarkedIds.size;
+}
+
+updateBookmarkBadge();
+
+    
     let isAdminLoggedIn = false;
 
     // 1. LISTEN TO FIRESTORE REALTIME UPDATES
@@ -716,13 +760,25 @@ if (isLoadingArticles) {
       grid.innerHTML = filtered.map(art => `
         <div class="scroll-reveal glass-card rounded-2xl p-6 flex flex-col justify-between space-y-5 relative">
           <div class="space-y-3">
-            <div class="flex items-center justify-between">
-              <span class="px-3 py-1 text-[11px] font-semibold rounded-full bg-purple-500/10 text-purple-300 border border-purple-500/20">${art.subject}</span>
-              <div class="flex items-center gap-2">
-                <span class="text-[11px] text-slate-500 font-mono">${art.date || ''}</span>
-                ${isAdminLoggedIn ? `<button onclick="deleteArticle('${art.id}')" class="text-slate-600 hover:text-rose-400 p-1"><i class="fa-solid fa-trash-can text-xs"></i></button>` : ''}
-              </div>
-            </div>
+           
+<div class="flex items-center justify-between">
+  <span class="px-3 py-1 text-[11px] font-semibold rounded-full bg-purple-500/10 text-purple-300 border border-purple-500/20">${art.subject}</span>
+
+  <div class="flex items-center gap-2">
+    <span class="text-[11px] text-slate-500 font-mono">${art.date || ''}</span>
+
+    <button
+      onclick="toggleBookmark('${art.id}')"
+      title="Ajouter ou retirer des favoris"
+      class="p-1 ${bookmarkedIds.has(art.id) ? 'text-amber-400' : 'text-slate-500 hover:text-amber-400'}"
+    >
+      <i class="fa-${bookmarkedIds.has(art.id) ? 'solid' : 'regular'} fa-bookmark text-sm"></i>
+    </button>
+
+    ${isAdminLoggedIn ? `<button onclick="deleteArticle('${art.id}')" class="text-slate-600 hover:text-rose-400 p-1"><i class="fa-solid fa-trash-can text-xs"></i></button>` : ''}
+  </div>
+</div>
+
             <h3 class="text-base font-bold text-white leading-snug">${art.title}</h3>
             <p class="text-xs text-slate-400 flex items-center gap-1.5"><i class="fa-regular fa-user text-purple-400"></i>${art.author}</p>
             <p class="text-slate-400 text-xs leading-relaxed line-clamp-3 bg-slate-950/40 p-3 rounded-xl border border-slate-900">${art.abstract}</p>
