@@ -198,6 +198,26 @@ async function activerNotifications() {
   }
 }
 
+    
+/* Mouse glow effect */
+.scivault-particle {
+  transition:
+    opacity 180ms ease,
+    filter 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.scivault-particle.mouse-glow {
+  opacity: 1 !important;
+  filter: brightness(1.8);
+  box-shadow:
+    0 0 8px var(--particle-color),
+    0 0 18px var(--particle-color),
+    0 0 30px var(--particle-color);
+  transform: scale(1.7);
+}
+  
+
 /* احترام إعداد تقليل الحركة */
 @media (prefers-reduced-motion: reduce) {
   .scivault-particle {
@@ -927,6 +947,42 @@ async function verifyAdminLogin(e) {
     container.appendChild(particle);
   }
 })();
+
+    
+/* ===== SciVault: Mouse Particle Glow ===== */
+if (!reduceMotion) {
+  const particles = container.querySelectorAll('.scivault-particle');
+  const glowRadius = 110;
+
+  container.addEventListener('pointermove', (event) => {
+    const rect = container.getBoundingClientRect();
+    const mouseX = event.clientX - rect.left;
+    const mouseY = event.clientY - rect.top;
+
+    particles.forEach((particle) => {
+      const particleRect = particle.getBoundingClientRect();
+      const particleX = particleRect.left + particleRect.width / 2 - rect.left;
+      const particleY = particleRect.top + particleRect.height / 2 - rect.top;
+
+      const distance = Math.hypot(
+        mouseX - particleX,
+        mouseY - particleY
+      );
+
+      particle.classList.toggle(
+        'mouse-glow',
+        distance < glowRadius
+      );
+    });
+  });
+
+  container.addEventListener('pointerleave', () => {
+    particles.forEach((particle) => {
+      particle.classList.remove('mouse-glow');
+    });
+  });
+}
+
     
 const revealObserver = ('IntersectionObserver' in window)
   ? new IntersectionObserver((entries, observer) => {
