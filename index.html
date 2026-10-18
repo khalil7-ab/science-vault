@@ -949,8 +949,18 @@ async function verifyAdminLogin(e) {
 })();
 
     
+
 /* ===== SciVault: Mouse Particle Glow ===== */
-if (!reduceMotion) {
+(function initMouseParticleGlow() {
+  const container = document.getElementById('heroParticles');
+  if (!container) return;
+
+  const reduceMotion = window.matchMedia(
+    '(prefers-reduced-motion: reduce)'
+  ).matches;
+
+  if (reduceMotion) return;
+
   const particles = container.querySelectorAll('.scivault-particle');
   const glowRadius = 110;
 
@@ -969,10 +979,7 @@ if (!reduceMotion) {
         mouseY - particleY
       );
 
-      particle.classList.toggle(
-        'mouse-glow',
-        distance < glowRadius
-      );
+      particle.classList.toggle('mouse-glow', distance < glowRadius);
     });
   });
 
@@ -981,8 +988,7 @@ if (!reduceMotion) {
       particle.classList.remove('mouse-glow');
     });
   });
-}
-
+})();
     
 const revealObserver = ('IntersectionObserver' in window)
   ? new IntersectionObserver((entries, observer) => {
