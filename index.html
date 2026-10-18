@@ -161,107 +161,71 @@ async function activerNotifications() {
       background-size: 32px 32px;
     }
     
-/* ===== SciVault: Floating Particles ===== */
-#heroParticles {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: 0;
-}
+    /* ===== SciVault: Interactive Canvas Particles ===== */
+    #heroParticles {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 0;
+    }
+    #heroParticles canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
 
-.scivault-particle {
-  position: absolute;
-  left: var(--x);
-  top: var(--y);
-  width: var(--size);
-  height: var(--size);
-  border-radius: 50%;
-  background: var(--particle-color);
-  opacity: 0.5;
-  box-shadow: 0 0 12px var(--particle-color);
-  animation: scivault-float var(--duration) ease-in-out
-    var(--delay) infinite alternate;
-}
+    /* Scroll Reveal */
+    .scroll-reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition:
+        opacity 550ms ease,
+        transform 550ms cubic-bezier(0.2, 0.7, 0.2, 1);
+    }
 
-@keyframes scivault-float {
-  0% {
-    opacity: 0.12;
-    transform: translate3d(0, 0, 0);
-  }
-  50% {
-    opacity: 0.65;
-  }
-  100% {
-    opacity: 0.2;
-    transform: translate3d(var(--move-x), var(--move-y), 0);
-  }
-}
+    .scroll-reveal.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
 
-    
-  
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-reveal,
+      .scroll-reveal.is-visible {
+        opacity: 1;
+        transform: none;
+        transition: none;
+      }
+    }
+        
+    /* Loading Skeleton */
+    .skeleton-shimmer {
+      background: linear-gradient(
+        100deg,
+        #111827 25%,
+        #1e293b 45%,
+        #111827 65%
+      );
+      background-size: 220% 100%;
+      animation: scivault-shimmer 1.6s ease-in-out infinite;
+      border: 1px solid rgba(255, 255, 255, 0.035);
+    }
 
-/* احترام إعداد تقليل الحركة */
-@media (prefers-reduced-motion: reduce) {
-  .scivault-particle {
-    animation: none;
-    opacity: 0.2;
-  }
-}
-   
-/* Scroll Reveal */
-.scroll-reveal {
-  opacity: 0;
-  transform: translateY(18px);
-  transition:
-    opacity 550ms ease,
-    transform 550ms cubic-bezier(0.2, 0.7, 0.2, 1);
-}
+    @keyframes scivault-shimmer {
+      from {
+        background-position: 100% 0;
+      }
+      to {
+        background-position: -120% 0;
+      }
+    }
 
-.scroll-reveal.is-visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .scroll-reveal,
-  .scroll-reveal.is-visible {
-    opacity: 1;
-    transform: none;
-    transition: none;
-  }
-}
-    
-/* Loading Skeleton */
-.skeleton-shimmer {
-  background: linear-gradient(
-    100deg,
-    #111827 25%,
-    #1e293b 45%,
-    #111827 65%
-  );
-  background-size: 220% 100%;
-  animation: scivault-shimmer 1.6s ease-in-out infinite;
-  border: 1px solid rgba(255, 255, 255, 0.035);
-}
-
-@keyframes scivault-shimmer {
-  from {
-    background-position: 100% 0;
-  }
-  to {
-    background-position: -120% 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .skeleton-shimmer {
-    animation: none;
-    background: #182131;
-  }
-}
-
-
+    @media (prefers-reduced-motion: reduce) {
+      .skeleton-shimmer {
+        animation: none;
+        background: #182131;
+      }
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col custom-scrollbar overflow-x-hidden selection:bg-purple-500 selection:text-white grid-bg">
@@ -886,52 +850,104 @@ async function verifyAdminLogin(e) {
     function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
     function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
     
-(function initHeroParticles() {
-  const container = document.getElementById('heroParticles');
-  if (!container) return;
+    // Interactive Canvas Particles Implementation
+    (function initInteractiveParticles() {
+      const container = document.getElementById('heroParticles');
+      if (!container) return;
 
-  const reduceMotion = window.matchMedia(
-    '(prefers-reduced-motion: reduce)'
-  ).matches;
+      const canvas = document.createElement('canvas');
+      container.appendChild(canvas);
+      const ctx = canvas.getContext('2d');
 
-  const particleCount = reduceMotion ? 12 : 24;
-  const colors = ['#A855F7', '#06B6D4', '#84CC16'];
+      let width, height;
+      let particles = [];
+      const mouse = { x: -1000, y: -1000, radius: 120 };
 
-  for (let i = 0; i < particleCount; i++) {
-    const particle = document.createElement('span');
-    particle.className = 'scivault-particle';
+      const colors = ['#A855F7', '#06B6D4', '#84CC16'];
 
-    const size = 2 + Math.random() * 4;
+      function resize() {
+        width = canvas.width = container.offsetWidth;
+        height = canvas.height = container.offsetHeight;
+      }
 
-    particle.style.setProperty('--x', `${Math.random() * 100}%`);
-    particle.style.setProperty('--y', `${Math.random() * 100}%`);
-    particle.style.setProperty('--size', `${size}px`);
-    particle.style.setProperty(
-      '--particle-color',
-      colors[i % colors.length]
-    );
-    particle.style.setProperty(
-      '--duration',
-      `${5 + Math.random() * 7}s`
-    );
-    particle.style.setProperty(
-      '--delay',
-      `${-Math.random() * 10}s`
-    );
-    particle.style.setProperty(
-      '--move-x',
-      `${-18 + Math.random() * 36}px`
-    );
-    particle.style.setProperty(
-      '--move-y',
-      `${-24 + Math.random() * 48}px`
-    );
+      window.addEventListener('resize', resize);
+      resize();
 
-    container.appendChild(particle);
-  }
-})();
+      container.addEventListener('mousemove', (e) => {
+        const rect = container.getBoundingClientRect();
+        mouse.x = e.clientX - rect.left;
+        mouse.y = e.clientY - rect.top;
+      });
 
-    
+      container.addEventListener('mouseleave', () => {
+        mouse.x = -1000;
+        mouse.y = -1000;
+      });
+
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const particleCount = reduceMotion ? 15 : 45;
+
+      for (let i = 0; i < particleCount; i++) {
+        particles.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          vx: (Math.random() - 0.5) * 0.8,
+          vy: (Math.random() - 0.5) * 0.8,
+          size: Math.random() * 2 + 1.5,
+          color: colors[i % colors.length]
+        });
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, width, height);
+
+        particles.forEach((p, index) => {
+          p.x += p.vx;
+          p.y += p.vy;
+
+          if (p.x < 0) p.x = width;
+          if (p.x > width) p.x = 0;
+          if (p.y < 0) p.y = height;
+          if (p.y > height) p.y = 0;
+
+          // Mouse interaction calculation
+          const dx = mouse.x - p.x;
+          const dy = mouse.y - p.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          
+          let currentSize = p.size;
+          let alpha = 0.4;
+
+          if (distance < mouse.radius) {
+            alpha = 0.9;
+            currentSize = p.size * 1.8;
+            
+            // Connect lines to mouse
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(mouse.x, mouse.y);
+            ctx.strokeStyle = p.color;
+            ctx.globalAlpha = (1 - distance / mouse.radius) * 0.35;
+            ctx.lineWidth = 0.8;
+            ctx.stroke();
+          }
+
+          // Draw particle
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, currentSize, 0, Math.PI * 2);
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = alpha;
+          ctx.shadowBlur = distance < mouse.radius ? 12 : 4;
+          ctx.shadowColor = p.color;
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        });
+
+        requestAnimationFrame(animate);
+      }
+
+      animate();
+    })();
 
     
 const revealObserver = ('IntersectionObserver' in window)
@@ -970,8 +986,6 @@ observeRevealElements(
 
     
 renderArticles();
-
-
 
   </script>
 </body>
