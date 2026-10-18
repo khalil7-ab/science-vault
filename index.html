@@ -279,13 +279,8 @@ async function activerNotifications() {
       </div>
 
   <div class="flex items-center gap-1 sm:gap-3 shrink-0">
-  <button id="bookmarkedFilterBtn" onclick="toggleBookmarksOnly()" class="px-2 sm:px-4 py-2 sm:py-2.5 rounded-xl glass-card hover:bg-slate-800 text-slate-300 text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 border border-slate-700/50">
-          <i class="fa-solid fa-bookmark text-amber-400"></i>
-          <span class="hidden sm:inline">Mes Favoris</span>
-          <span id="bookmarkBadge" class="bg-amber-500/20 text-amber-300 text-xs px-2 py-0.5 rounded-full font-mono">0</span>
-        </button>
 
-        <button
+     <button
   id="enableNotificationsBtn"
   onclick="activerNotifications()"
   class="px-2 sm:px-3 py-2 sm:py-2.5 rounded-xl glass-card text-cyan-300 text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 border border-cyan-500/30"
@@ -294,6 +289,14 @@ async function activerNotifications() {
   <i class="fa-solid fa-bell"></i>
   <span class="hidden sm:inline">Notifications</span>
 </button>
+    
+  <button id="bookmarkedFilterBtn" onclick="toggleBookmarksOnly()" class="px-2 sm:px-4 py-2 sm:py-2.5 rounded-xl glass-card hover:bg-slate-800 text-slate-300 text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 border border-slate-700/50">
+          <i class="fa-solid fa-bookmark text-amber-400"></i>
+          <span class="hidden sm:inline">Mes Favoris</span>
+          <span id="bookmarkBadge" class="bg-amber-500/20 text-amber-300 text-xs px-2 py-0.5 rounded-full font-mono">0</span>
+        </button>
+
+      
 
        
 <button
