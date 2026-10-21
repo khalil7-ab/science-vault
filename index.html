@@ -353,9 +353,159 @@ async function activerNotifications() {
   }
 }
 
+
+/* ===== SciVault Splash Screen ===== */
+#scivaultSplash {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(124, 58, 237, 0.13),
+      transparent 42%
+    ),
+    #070A11;
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 350ms ease,
+    visibility 350ms ease;
+}
+
+#scivaultSplash.splash-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.splash-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 13px;
+  animation: scivault-logo-intro 1.5s ease-in-out both;
+}
+
+.splash-logo {
+  width: 86px;
+  height: 86px;
+  padding: 3px;
+  border-radius: 27px;
+  background: linear-gradient(
+    135deg,
+    #7C3AED,
+    #06B6D4,
+    #84CC16
+  );
+  box-shadow:
+    0 0 25px rgba(6, 182, 212, 0.20),
+    0 0 55px rgba(124, 58, 237, 0.15);
+}
+
+.splash-logo-inner {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 24px;
+  background: #070A11;
+}
+
+.splash-logo-inner i {
+  font-size: 46px;
+  color: #22D3EE;
+  animation: scivault-atom-spin 4s linear infinite;
+}
+
+.splash-title {
+  margin: 0;
+  font-size: 34px;
+  line-height: 1.2;
+  font-weight: 900;
+  letter-spacing: -1px;
+  background: linear-gradient(
+    135deg,
+    #A855F7,
+    #06B6D4 55%,
+    #84CC16
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.splash-subtitle {
+  margin: 0;
+  color: #94A3B8;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-align: center;
+}
+
+@keyframes scivault-logo-intro {
+  0% {
+    opacity: 0;
+    transform: scale(0.55);
+  }
+  20% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  65% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.8);
+  }
+}
+
+@keyframes scivault-atom-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .splash-logo-inner i {
+    animation: none;
+  }
+
+  .splash-content {
+    animation: none;
+  }
+}
+/* ===== End SciVault Splash Screen ===== */
+
+
   </style>
 </head>
 <body class="min-h-screen flex flex-col custom-scrollbar overflow-x-hidden selection:bg-purple-500 selection:text-white grid-bg">
+
+    
+  <!-- SciVault Splash Screen -->
+  <div id="scivaultSplash" role="status" aria-label="Chargement de SciVault">
+    <div class="splash-content">
+      <div class="splash-logo">
+        <div class="splash-logo-inner">
+          <i class="fa-solid fa-atom"></i>
+        </div>
+      </div>
+
+      <h1 class="splash-title">SciVault</h1>
+      <p class="splash-subtitle">SCIENCE · DISCOVER · EXPLORE</p>
+    </div>
+  </div>
+  <!-- End SciVault Splash Screen -->
+
 
   <!-- Header -->
   <header class="sticky top-0 z-40 glass-nav transition-all duration-300">
@@ -1140,6 +1290,15 @@ observeRevealElements(
 
     
 renderArticles();
+// ===== SciVault Splash Screen: 1.5 seconds =====
+(() => {
+  const splash = document.getElementById('scivaultSplash');
+  if (!splash) return;
+
+  window.setTimeout(() => {
+    splash.remove();
+  }, 1500);
+})();
 
   </script>
 </body>
