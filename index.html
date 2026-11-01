@@ -1,16 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr" class="dark scroll-smooth">
 <head>
-
-  <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-QNWFCMFG83"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-QNWFCMFG83');
-</script>
   <!-- SEO & Meta Tags -->
   <title>SciVault - Plateforme Scientifique & Archives de Recherche</title>
   <meta name="description" content="SciVault est votre coffre-fort scientifique personnel. Découvrez, organisez et partagez des articles scientifiques.">
@@ -36,6 +26,11 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <script>
+
+function showSciVaultOverviewComingSoon() {
+  alert("La Vue Générale de SciVault sera bientôt disponible !");
+}
+
     // Configuration Tailwind
     tailwind.config = {
       darkMode: 'class',
@@ -543,6 +538,18 @@ async function activerNotifications() {
   <i class="fa-solid fa-bell"></i>
   <span class="hidden sm:inline">Notifications</span>
 </button>
+
+<!-- Vue Générale Button -->
+<button
+  id="generalViewBtn"
+  onclick="showSciVaultOverviewComingSoon()"
+  class="px-2 sm:px-3 py-2 sm:py-2.5 rounded-xl glass-card text-purple-300 text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 border border-purple-500/30 hover:border-cyan-400/50 hover:text-cyan-300"
+  title="Découvrir SciVault"
+  aria-label="Ouvrir la vue générale de SciVault"
+>
+  <i class="fa-solid fa-atom"></i>
+  <span class="hidden sm:inline">Vue Générale</span>
+</button>
     
   <button id="bookmarkedFilterBtn" onclick="toggleBookmarksOnly()" class="px-2 sm:px-4 py-2 sm:py-2.5 rounded-xl glass-card hover:bg-slate-800 text-slate-300 text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 border border-slate-700/50">
           <i class="fa-solid fa-bookmark text-amber-400"></i>
@@ -590,7 +597,7 @@ async function activerNotifications() {
 
       <!-- ✏️ بدل غير النص التالي ملي يكون إعلان جديد -->
       <p class="scivault-announcement-text">
-          NOUVEAUX RESOURCE DRIVES DISPONIBLES !
+          Modification dans le drive GB & GEG (s1) | Nouvelle ressource GC GI GP GESE MSD disponible sur Google Drive !
       </p>
     </div>
   </div>
