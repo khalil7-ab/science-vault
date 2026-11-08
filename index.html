@@ -1407,6 +1407,133 @@ document.addEventListener('keydown', function(event) {
     </div>
   </div>
 
+    <!-- Edit Article Modal -->
+<div id="editArticleModal"
+     class="fixed inset-0 z-[60] bg-slate-950/90 backdrop-blur-md hidden items-center justify-center p-4 overflow-y-auto">
+
+  <div class="glass-card max-w-2xl w-full rounded-3xl border border-cyan-500/30 p-6 sm:p-8 space-y-6 my-8">
+
+    <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+      <div>
+        <h3 class="text-xl font-bold text-white">
+          <i class="fa-solid fa-pen-to-square text-cyan-400 mr-2"></i>
+          Modifier l'Article
+        </h3>
+        <p class="text-xs text-slate-400 mt-1">Admin Control Panel</p>
+      </div>
+
+      <button type="button"
+              onclick="closeEditArticleModal()"
+              class="text-slate-500 hover:text-white">
+        <i class="fa-solid fa-xmark text-xl"></i>
+      </button>
+    </div>
+
+    <form id="editArticleForm"
+          onsubmit="updateArticle(event)"
+          class="space-y-4">
+
+      <input type="hidden" id="editArticleId">
+
+      <!-- Title -->
+      <div>
+        <label class="block text-xs font-semibold text-slate-300 mb-1">
+          Titre *
+        </label>
+        <input type="text" id="editTitle" required
+               class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm">
+      </div>
+
+      <!-- Subject and Author -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">
+            Domaine *
+          </label>
+          <input type="text" id="editSubject" required
+                 class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">
+            Auteur *
+          </label>
+          <input type="text" id="editAuthor" required
+                 class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm">
+        </div>
+
+      </div>
+
+      <!-- Abstract -->
+      <div>
+        <label class="block text-xs font-semibold text-slate-300 mb-1">
+          Résumé *
+        </label>
+        <textarea id="editAbstract" rows="4" required
+                  class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm"></textarea>
+      </div>
+
+      <!-- Links -->
+      <div class="space-y-3 p-4 rounded-2xl bg-slate-900/60 border border-slate-800">
+
+        <h4 class="text-xs font-bold text-cyan-300 uppercase">
+          Modifier les liens
+        </h4>
+
+        <div>
+          <label class="text-xs text-slate-400">PDF Link</label>
+          <input type="url" id="editPdfUrl"
+                 placeholder="https://..."
+                 class="w-full mt-1 px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs font-mono text-white">
+        </div>
+
+        <div>
+          <label class="text-xs text-slate-400">Google Drive Link</label>
+          <input type="url" id="editDriveUrl"
+                 placeholder="https://..."
+                 class="w-full mt-1 px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs font-mono text-white">
+        </div>
+
+        <div>
+          <label class="text-xs text-slate-400">External Link / Website</label>
+          <input type="url" id="editExternalUrl"
+                 placeholder="https://..."
+                 class="w-full mt-1 px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs font-mono text-white">
+        </div>
+
+      </div>
+
+      <!-- Date -->
+      <div>
+        <label class="block text-xs font-semibold text-slate-300 mb-1">
+          Date
+        </label>
+        <input type="text" id="editDate"
+               class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm">
+      </div>
+
+      <div class="flex flex-wrap justify-end gap-3 pt-3">
+
+        <button type="button"
+                onclick="closeEditArticleModal()"
+                class="px-4 py-2.5 rounded-xl bg-slate-800 text-slate-300 text-xs font-semibold">
+          Annuler
+        </button>
+
+        <button type="submit"
+                id="saveArticleChangesBtn"
+                class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 text-white text-xs font-bold">
+          <i class="fa-solid fa-floppy-disk mr-1"></i>
+          Save Changes
+        </button>
+
+      </div>
+
+    </form>
+  </div>
+</div>
+
   <!-- JavaScript Firestore Logic -->
   <script>
 
@@ -1525,6 +1652,146 @@ updateBookmarkBadge();
         });
     }
 
+    // ==========================================
+// SCIVAULT — ADMIN ARTICLE EDIT SYSTEM
+// ==========================================
+
+// Open Edit Modal and Load Article Data
+async function openEditArticle(articleId) {
+
+  if (!isAdminLoggedIn || !auth.currentUser) {
+    alert("Accès réservé à l'administrateur.");
+    return;
+  }
+
+  const authorized = await checkAdminRole(auth.currentUser);
+
+  if (!authorized) {
+    alert("Accès refusé.");
+    return;
+  }
+
+  const article = articles.find(a => a.id === articleId);
+
+  if (!article) {
+    alert("Article introuvable.");
+    return;
+  }
+
+  // Fill the form with current data
+  document.getElementById('editArticleId').value = article.id;
+  document.getElementById('editTitle').value = article.title || '';
+  document.getElementById('editSubject').value = article.subject || '';
+  document.getElementById('editAuthor').value = article.author || '';
+  document.getElementById('editAbstract').value = article.abstract || '';
+
+  document.getElementById('editPdfUrl').value = article.pdfUrl || '';
+  document.getElementById('editDriveUrl').value = article.driveUrl || '';
+  document.getElementById('editExternalUrl').value = article.externalUrl || '';
+
+  document.getElementById('editDate').value = article.date || '';
+
+  const modal = document.getElementById('editArticleModal');
+
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+}
+
+
+// Save Article Changes
+async function updateArticle(event) {
+
+  event.preventDefault();
+
+  if (!isAdminLoggedIn || !auth.currentUser) {
+    alert("Accès réservé à l'administrateur.");
+    return;
+  }
+
+  const authorized = await checkAdminRole(auth.currentUser);
+
+  if (!authorized) {
+    alert("Vous n'avez pas les autorisations nécessaires.");
+    return;
+  }
+
+  const articleId = document.getElementById('editArticleId').value;
+
+  const pdfUrl = document.getElementById('editPdfUrl').value.trim();
+  const driveUrl = document.getElementById('editDriveUrl').value.trim();
+  const externalUrl = document.getElementById('editExternalUrl').value.trim();
+
+  // At least one link is required
+  if (!pdfUrl && !driveUrl && !externalUrl) {
+    alert("Veuillez conserver au moins un lien.");
+    return;
+  }
+
+  const updatedArticle = {
+    title: document.getElementById('editTitle').value.trim(),
+    subject: document.getElementById('editSubject').value.trim(),
+    author: document.getElementById('editAuthor').value.trim(),
+    abstract: document.getElementById('editAbstract').value.trim(),
+
+    pdfUrl: pdfUrl,
+    driveUrl: driveUrl,
+    externalUrl: externalUrl,
+
+    date: document.getElementById('editDate').value.trim()
+  };
+
+  if (
+    !updatedArticle.title ||
+    !updatedArticle.subject ||
+    !updatedArticle.author ||
+    !updatedArticle.abstract
+  ) {
+    alert("Veuillez remplir tous les champs obligatoires.");
+    return;
+  }
+
+  const saveButton = document.getElementById('saveArticleChangesBtn');
+
+  saveButton.disabled = true;
+  saveButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+
+  try {
+
+    await db.collection("articles")
+      .doc(articleId)
+      .update(updatedArticle);
+
+    alert("Article modifié avec succès !");
+
+    closeEditArticleModal();
+
+  } catch (error) {
+
+    console.error("Erreur modification article :", error);
+
+    alert("Erreur lors de la modification : " + error.message);
+
+  } finally {
+
+    saveButton.disabled = false;
+
+    saveButton.innerHTML =
+      '<i class="fa-solid fa-floppy-disk mr-1"></i> Save Changes';
+
+  }
+}
+
+
+// Close Edit Modal
+function closeEditArticleModal() {
+
+  const modal = document.getElementById('editArticleModal');
+
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+
+}
+
     // 3. DELETE ARTICLE FROM FIRESTORE
     function deleteArticle(artId) {
       if (confirm("Voulez-vous vraiment supprimer cet article ?")) {
@@ -1618,8 +1885,21 @@ if (isLoadingArticles) {
       <i class="fa-${bookmarkedIds.has(art.id) ? 'solid' : 'regular'} fa-bookmark text-sm"></i>
     </button>
 
-    ${isAdminLoggedIn ? `<button onclick="deleteArticle('${art.id}')" class="text-slate-600 hover:text-rose-400 p-1"><i class="fa-solid fa-trash-can text-xs"></i></button>` : ''}
-  </div>
+${isAdminLoggedIn ? `
+  <button
+    onclick="openEditArticle('${art.id}')"
+    title="Modifier cet article"
+    class="text-cyan-400 hover:text-cyan-300 p-1">
+    <i class="fa-solid fa-pen-to-square text-xs"></i>
+  </button>
+
+  <button
+    onclick="deleteArticle('${art.id}')"
+    title="Supprimer cet article"
+    class="text-slate-600 hover:text-rose-400 p-1">
+    <i class="fa-solid fa-trash-can text-xs"></i>
+  </button>
+` : ''}  </div>
 </div>
 
             <h3 class="text-base font-bold text-white leading-snug">${art.title}</h3>
