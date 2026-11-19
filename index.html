@@ -1,15 +1,18 @@
 <!DOCTYPE html>
 <html lang="fr" class="dark scroll-smooth">
+
 <head>
   <!-- SEO & Meta Tags -->
   <title>SciVault - Plateforme Scientifique & Archives de Recherche</title>
-  <meta name="description" content="SciVault est votre coffre-fort scientifique personnel. Découvrez, organisez et partagez des articles scientifiques.">
+  <meta name="description"
+    content="SciVault est votre coffre-fort scientifique personnel. Découvrez, organisez et partagez des articles scientifiques.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
 
   <!-- Favicon -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚛️</text></svg>">
-  
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚛️</text></svg>">
+
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
@@ -22,14 +25,16 @@
   <!-- Google Fonts & FontAwesome -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <script>
 
-function showSciVaultOverviewComingSoon() {
-  alert("La Vue Générale de SciVault sera bientôt disponible !");
-}
+    function showSciVaultOverviewComingSoon() {
+      alert("La Vue Générale de SciVault sera bientôt disponible !");
+    }
 
     // Configuration Tailwind
     tailwind.config = {
@@ -80,93 +85,93 @@ function showSciVaultOverviewComingSoon() {
     const db = firebase.firestore();
     const auth = firebase.auth();
     const messaging = firebase.messaging();
-    
 
-async function activerNotifications() {
-  try {
-    if (!("Notification" in window) || !("serviceWorker" in navigator)) {
-      alert("Votre navigateur ne prend pas en charge les notifications.");
-      return;
+
+    async function activerNotifications() {
+      try {
+        if (!("Notification" in window) || !("serviceWorker" in navigator)) {
+          alert("Votre navigateur ne prend pas en charge les notifications.");
+          return;
+        }
+
+        const permission = await Notification.requestPermission();
+
+        if (permission !== "granted") {
+          alert("Vous n'avez pas autorisé les notifications.");
+          return;
+        }
+
+        const registration = await navigator.serviceWorker.register(
+          "./firebase-messaging-sw.js",
+          { scope: "./" }
+        );
+
+        await navigator.serviceWorker.ready;
+
+        if (!registration.active) {
+          throw new Error("Le Service Worker n'est pas encore actif. Réessayez.");
+        }
+
+        const token = await messaging.getToken({
+          vapidKey: "BJnupK9FvJHIu172CqWfUpYhMWMkg8outy3HKT8AzqR8VMpDE3lrBkEOl-kU8m1nWq_ua6x_TTb7WT8kN84HKvs",
+          serviceWorkerRegistration: registration
+        });
+
+        if (!token) {
+          throw new Error("Aucun token de notification n'a été créé.");
+        }
+
+        await db.collection("pushTokens").add({
+          token: token,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        alert("Notifications activées !");
+      } catch (error) {
+        console.error("Erreur notifications SciVault :", error);
+        alert("Erreur : " + error.message);
+      }
     }
-
-    const permission = await Notification.requestPermission();
-
-    if (permission !== "granted") {
-      alert("Vous n'avez pas autorisé les notifications.");
-      return;
-    }
-
-    const registration = await navigator.serviceWorker.register(
-      "./firebase-messaging-sw.js",
-      { scope: "./" }
-    );
-
-    await navigator.serviceWorker.ready;
-
-    if (!registration.active) {
-      throw new Error("Le Service Worker n'est pas encore actif. Réessayez.");
-    }
-
-    const token = await messaging.getToken({
-      vapidKey: "BJnupK9FvJHIu172CqWfUpYhMWMkg8outy3HKT8AzqR8VMpDE3lrBkEOl-kU8m1nWq_ua6x_TTb7WT8kN84HKvs",
-      serviceWorkerRegistration: registration
-    });
-
-    if (!token) {
-      throw new Error("Aucun token de notification n'a été créé.");
-    }
-
-    await db.collection("pushTokens").add({
-      token: token,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-
-    alert("Notifications activées !");
-  } catch (error) {
-    console.error("Erreur notifications SciVault :", error);
-    alert("Erreur : " + error.message);
-  }
-}
     /* =====================================
    SCIVAULT — GENERAL VIEW CONTROLS
 ===================================== */
 
-function launchSciVaultOverview() {
-  const overview = document.getElementById('svOverview');
+    function launchSciVaultOverview() {
+      const overview = document.getElementById('svOverview');
 
-  if (!overview) {
-    console.error('SciVault Overview not found.');
-    return;
-  }
+      if (!overview) {
+        console.error('SciVault Overview not found.');
+        return;
+      }
 
-  overview.classList.remove('active');
+      overview.classList.remove('active');
 
-  // Restart all animations
-  void overview.offsetWidth;
+      // Restart all animations
+      void overview.offsetWidth;
 
-  overview.classList.add('active');
-  overview.setAttribute('aria-hidden', 'false');
+      overview.classList.add('active');
+      overview.setAttribute('aria-hidden', 'false');
 
-  document.body.style.overflow = 'hidden';
-}
+      document.body.style.overflow = 'hidden';
+    }
 
-function closeSciVaultOverview() {
-  const overview = document.getElementById('svOverview');
+    function closeSciVaultOverview() {
+      const overview = document.getElementById('svOverview');
 
-  if (!overview) return;
+      if (!overview) return;
 
-  overview.classList.remove('active');
-  overview.setAttribute('aria-hidden', 'true');
+      overview.classList.remove('active');
+      overview.setAttribute('aria-hidden', 'true');
 
-  document.body.style.overflow = '';
-}
+      document.body.style.overflow = '';
+    }
 
-// Close with Escape key
-document.addEventListener('keydown', function(event) {
-  if (event.key === 'Escape') {
-    closeSciVaultOverview();
-  }
-});
+    // Close with Escape key
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape') {
+        closeSciVaultOverview();
+      }
+    });
   </script>
 
   <style>
@@ -175,6 +180,7 @@ document.addEventListener('keydown', function(event) {
       background-color: #070A11;
       color: #F3F4F6;
     }
+
     .glass-card {
       background: rgba(17, 24, 39, 0.75);
       backdrop-filter: blur(16px);
@@ -182,29 +188,43 @@ document.addEventListener('keydown', function(event) {
       border: 1px solid rgba(255, 255, 255, 0.08);
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
+
     .glass-card:hover {
       transform: translateY(-4px);
       border-color: rgba(124, 58, 237, 0.4);
       box-shadow: 0 12px 30px -10px rgba(124, 58, 237, 0.25);
     }
+
     .glass-nav {
       background: rgba(7, 10, 17, 0.85);
       backdrop-filter: blur(20px);
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
+
     .gradient-text {
       background: linear-gradient(135deg, #A855F7 0%, #06B6D4 50%, #84CC16 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
-    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-    .custom-scrollbar::-webkit-scrollbar-track { background: #070A11; }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background: #1F2937; border-radius: 10px; }
+
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #070A11;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #1F2937;
+      border-radius: 10px;
+    }
+
     .grid-bg {
       background-image: radial-gradient(rgba(124, 58, 237, 0.12) 1px, transparent 0);
       background-size: 32px 32px;
     }
-    
+
     /* ===== SciVault: Interactive Canvas Particles ===== */
     #heroParticles {
       position: absolute;
@@ -213,6 +233,7 @@ document.addEventListener('keydown', function(event) {
       pointer-events: none;
       z-index: 0;
     }
+
     #heroParticles canvas {
       display: block;
       width: 100%;
@@ -234,6 +255,7 @@ document.addEventListener('keydown', function(event) {
     }
 
     @media (prefers-reduced-motion: reduce) {
+
       .scroll-reveal,
       .scroll-reveal.is-visible {
         opacity: 1;
@@ -241,15 +263,13 @@ document.addEventListener('keydown', function(event) {
         transition: none;
       }
     }
-        
+
     /* Loading Skeleton */
     .skeleton-shimmer {
-      background: linear-gradient(
-        100deg,
-        #111827 25%,
-        #1e293b 45%,
-        #111827 65%
-      );
+      background: linear-gradient(100deg,
+          #111827 25%,
+          #1e293b 45%,
+          #111827 65%);
       background-size: 220% 100%;
       animation: scivault-shimmer 1.6s ease-in-out infinite;
       border: 1px solid rgba(255, 255, 255, 0.035);
@@ -259,6 +279,7 @@ document.addEventListener('keydown', function(event) {
       from {
         background-position: 100% 0;
       }
+
       to {
         background-position: -120% 0;
       }
@@ -271,703 +292,772 @@ document.addEventListener('keydown', function(event) {
       }
     }
 
-    
-/* ===== SciVault ncement Bar ===== */
-.scivault-ncement-wrap {
-  display: flex;
-  justify-content: center;
-  padding: 12px 16px ;
-}
 
-.scivault-announcement {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  width: fit-content;
-  max-width: 100%;
-  padding: 9px 16px;
-  border: 1px solid rgba(139, 92, 246, 0.25);
-  border-radius: 14px;
-  background: linear-gradient(
-    110deg,
-    rgba(139, 92, 246, 0.09),
-    rgba(34, 211, 238, 0.06)
-  );
-  box-shadow: 0 4px 18px rgba(139, 92, 246, 0.06);
-}
+    /* ===== SciVault ncement Bar ===== */
+    .scivault-announcement-wrap{
+      display: flex;
+      justify-content: center;
+      padding: 12px 16px;
+    }
 
-.scivault-announcement-icon {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  flex-shrink: 0;
-  color: #a78bfa;
-  font-size: 17px;
-  animation: scivault-megaphone-pulse 2s ease-in-out infinite;
-}
+    .scivault-announcement {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: fit-content;
+      max-width: 100%;
+      padding: 9px 16px;
+      border: 1px solid rgba(139, 92, 246, 0.25);
+      border-radius: 14px;
+      background: linear-gradient(110deg,
+          rgba(139, 92, 246, 0.09),
+          rgba(34, 211, 238, 0.06));
+      box-shadow: 0 4px 18px rgba(139, 92, 246, 0.06);
+    }
 
-/* Three small broadcast rays */
-.scivault-announcement-rays {
-  position: absolute;
-  left: calc(100% + 2px);
-  top: 50%;
-  width: 9px;
-  height: 18px;
-  transform: translateY(-50%);
-}
+    .scivault-announcement-icon {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      flex-shrink: 0;
+      color: #a78bfa;
+      font-size: 17px;
+      animation: scivault-megaphone-pulse 2s ease-in-out infinite;
+    }
 
-.scivault-announcement-rays span {
-  position: absolute;
-  left: 0;
-  width: 5px;
-  height: 2px;
-  border-radius: 3px;
-  background: #22d3ee;
-  opacity: 0;
-  animation: scivault-ray-appear 1.5s ease-in-out infinite;
-}
+    /* Three small broadcast rays */
+    .scivault-announcement-rays {
+      position: absolute;
+      left: calc(100% + 2px);
+      top: 50%;
+      width: 9px;
+      height: 18px;
+      transform: translateY(-50%);
+    }
 
-.scivault-ncement-rays span:nth-child(1) {
-  top: 2px;
-  transform: rotate(-40deg);
-}
+    .scivault-announcement-rays span {
+      position: absolute;
+      left: 0;
+      width: 5px;
+      height: 2px;
+      border-radius: 3px;
+      background: #22d3ee;
+      opacity: 0;
+      animation: scivault-ray-appear 1.5s ease-in-out infinite;
+    }
 
-.scivault-ncement-rays span:nth-child(2) {
-  top: 8px;
-  width: 7px;
-  animation-delay: 0.25s;
-}
+    .scivault-announcement-rays span:nth-child(1) {
+      top: 2px;
+      transform: rotate(-40deg);
+    }
 
-.scivault-ncement-rays span:nth-child(3) {
-  top: 14px;
-  transform: rotate(40deg);
-  animation-delay: 0.5s;
-}
+    .scivault-announcement-rays span:nth-child(2) {
+      top: 8px;
+      width: 7px;
+      animation-delay: 0.25s;
+    }
 
-.scivault-ncement-text {
-  margin: 0;
-  color: #e2e8f0;
-  font-size: 12px;
-  line-height: 1.6;
-  font-weight: 500;
-  text-align: center;
-  overflow-wrap: anywhere;
-}
+    .scivault-announcement-rays span:nth-child(3) {
+      top: 14px;
+      transform: rotate(40deg);
+      animation-delay: 0.5s;
+    }
 
-@keyframes scivault-megaphone-pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.08); }
-}
+    .scivault-announcement-text{
+      margin: 0;
+      color: #e2e8f0;
+      font-size: 12px;
+      line-height: 1.6;
+      font-weight: 500;
+      text-align: center;
+      overflow-wrap: anywhere;
+    }
 
-@keyframes scivault-ray-appear {
-  0%, 100% {
-    opacity: 0;
-    transform: translateX(-2px) scale(0.8);
-  }
-  45%, 65% {
-    opacity: 1;
-    transform: translateX(1px) scale(1);
-  }
-}
+    @keyframes scivault-megaphone-pulse {
 
-@media (max-width: 480px) {
-  .scivault-ncement-wrap {
-    padding: 8px 10px 0;
-  }
+      0%,
+      100% {
+        transform: scale(1);
+      }
 
-  .scivault-ncement {
-    gap: 9px;
-    padding: 8px 12px;
-  }
+      50% {
+        transform: scale(1.08);
+      }
+    }
 
-  .scivault-announcement-text {
-    font-size: 11px;
-  }
-}
+    @keyframes scivault-ray-appear {
 
-@media (prefers-reduced-motion: reduce) {
-  .scivault-announcement-icon,
-  .scivault-announcement-rays span {
-    animation: none;
-  }
+      0%,
+      100% {
+        opacity: 0;
+        transform: translateX(-2px) scale(0.8);
+      }
 
-  .scivault-announcement-rays span {
-    opacity: 0.7;
-  }
-}
+      45%,
+      65% {
+        opacity: 1;
+        transform: translateX(1px) scale(1);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .scivault-announcement-wrap {
+        padding: 8px 10px 0;
+      }
+
+      .scivault-announcement{
+        gap: 9px;
+        padding: 8px 12px;
+      }
+
+      .scivault-announcement-text {
+        font-size: 11px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      .scivault-announcement-icon,
+      .scivault-announcement-rays span {
+        animation: none;
+      }
+
+      .scivault-announcement-rays span {
+        opacity: 0.7;
+      }
+    }
 
 
-/* ===== SciVault Splash Screen ===== */
-#scivaultSplash {
-  position: fixed;
-  inset: 0;
-  z-index: 99999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  background:
-    radial-gradient(
-      circle at center,
-      rgba(124, 58, 237, 0.13),
-      transparent 42%
-    ),
-    #070A11;
-  opacity: 1;
-  visibility: visible;
-  transition:
-    opacity 350ms ease,
-    visibility 350ms ease;
-}
+    /* ===== SciVault Splash Screen ===== */
+    #scivaultSplash {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at center,
+          rgba(124, 58, 237, 0.13),
+          transparent 42%),
+        #070A11;
+      opacity: 1;
+      visibility: visible;
+      transition:
+        opacity 350ms ease,
+        visibility 350ms ease;
+    }
 
-#scivaultSplash.splash-hidden {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-}
+    #scivaultSplash.splash-hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
 
-.splash-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 13px;
-  animation: scivault-logo-intro 1.5s ease-in-out both;
-}
+    .splash-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 13px;
+      animation: scivault-logo-intro 1.5s ease-in-out both;
+    }
 
-.splash-logo {
-  width: 86px;
-  height: 86px;
-  padding: 3px;
-  border-radius: 27px;
-  background: linear-gradient(
-    135deg,
-    #7C3AED,
-    #06B6D4,
-    #84CC16
-  );
-  box-shadow:
-    0 0 25px rgba(6, 182, 212, 0.20),
-    0 0 55px rgba(124, 58, 237, 0.15);
-}
+    .splash-logo {
+      width: 86px;
+      height: 86px;
+      padding: 3px;
+      border-radius: 27px;
+      background: linear-gradient(135deg,
+          #7C3AED,
+          #06B6D4,
+          #84CC16);
+      box-shadow:
+        0 0 25px rgba(6, 182, 212, 0.20),
+        0 0 55px rgba(124, 58, 237, 0.15);
+    }
 
-.splash-logo-inner {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 24px;
-  background: #070A11;
-}
+    .splash-logo-inner {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 24px;
+      background: #070A11;
+    }
 
-.splash-logo-inner i {
-  font-size: 46px;
-  color: #22D3EE;
-  animation: scivault-atom-spin 4s linear infinite;
-}
+    .splash-logo-inner i {
+      font-size: 46px;
+      color: #22D3EE;
+      animation: scivault-atom-spin 4s linear infinite;
+    }
 
-.splash-title {
-  margin: 0;
-  font-size: 34px;
-  line-height: 1.2;
-  font-weight: 900;
-  letter-spacing: -1px;
-  background: linear-gradient(
-    135deg,
-    #A855F7,
-    #06B6D4 55%,
-    #84CC16
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
+    .splash-title {
+      margin: 0;
+      font-size: 34px;
+      line-height: 1.2;
+      font-weight: 900;
+      letter-spacing: -1px;
+      background: linear-gradient(135deg,
+          #A855F7,
+          #06B6D4 55%,
+          #84CC16);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
 
-.splash-subtitle {
-  margin: 0;
-  color: #94A3B8;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 3px;
-  text-align: center;
-}
+    .splash-subtitle {
+      margin: 0;
+      color: #94A3B8;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-align: center;
+    }
 
-@keyframes scivault-logo-intro {
-  0% {
-    opacity: 0;
-    transform: scale(0.55);
-  }
-  20% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  65% {
-    opacity: 1;
-    transform: scale(1.08);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(1.8);
-  }
-}
+    @keyframes scivault-logo-intro {
+      0% {
+        opacity: 0;
+        transform: scale(0.55);
+      }
 
-@keyframes scivault-atom-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
+      20% {
+        opacity: 1;
+        transform: scale(1);
+      }
 
-@media (prefers-reduced-motion: reduce) {
-  .splash-logo-inner i {
-    animation: none;
-  }
+      65% {
+        opacity: 1;
+        transform: scale(1.08);
+      }
 
-  .splash-content {
-    animation: none;
-  }
-}
-/* ===== End SciVault Splash Screen ===== */
+      100% {
+        opacity: 0;
+        transform: scale(1.8);
+      }
+    }
+
+    @keyframes scivault-atom-spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .splash-logo-inner i {
+        animation: none;
+      }
+
+      .splash-content {
+        animation: none;
+      }
+    }
+
+    /* ===== End SciVault Splash Screen ===== */
 
 
     /* =========================================
    SCIVAULT — CINEMATIC GENERAL VIEW
 ========================================= */
 
-#svOverview {
-  position: fixed;
-  inset: 0;
-  z-index: 99998;
-  display: none;
-  overflow: hidden;
-  color: #f8fafc;
-  background:
-    radial-gradient(ellipse at 50% 48%, rgba(91, 33, 182, .20), transparent 40%),
-    radial-gradient(ellipse at 50% 100%, rgba(6, 182, 212, .10), transparent 55%),
-    #050711;
-  font-family: 'Inter', sans-serif;
-}
-
-#svOverview.active {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  animation: svFadeIn .7s ease both;
-}
-
-#svOverview::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  opacity: .18;
-  background-image:
-    linear-gradient(rgba(148,163,184,.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(148,163,184,.08) 1px, transparent 1px);
-  background-size: 55px 55px;
-  mask-image: radial-gradient(ellipse, black, transparent 80%);
-}
-
-.sv-close {
-  position: absolute;
-  top: 24px;
-  right: 26px;
-  z-index: 20;
-  width: 44px;
-  height: 44px;
-  border: 1px solid rgba(255,255,255,.15);
-  border-radius: 14px;
-  color: #cbd5e1;
-  background: rgba(15,23,42,.65);
-  backdrop-filter: blur(12px);
-  cursor: pointer;
-  transition: .3s;
-}
-
-.sv-close:hover {
-  color: white;
-  border-color: #22d3ee;
-  transform: rotate(90deg);
-}
-
-.sv-heading {
-  position: absolute;
-  top: 8%;
-  width: 100%;
-  text-align: center;
-  opacity: 0;
-  animation: svTextIn 1s ease 0.4s forwards;
-}
-
-.sv-heading small {
-  color: #22d3ee;
-  font: 600 10px 'Fira Code', monospace;
-  letter-spacing: 5px;
-}
-
-.sv-heading h2 {
-  margin-top: 12px;
-  font-size: clamp(24px, 4vw, 42px);
-  font-weight: 900;
-  letter-spacing: -1.5px;
-}
-
-.sv-heading p {
-  margin-top: 9px;
-  color: #94a3b8;
-  font-size: 12px;
-  letter-spacing: 2px;
-}
-
-.sv-stage {
-  position: relative;
-  width: min(760px, 94vw);
-  height: min(590px, 76vh);
-  min-height: 390px;
-  margin-top: 35px;
-}
-
-.sv-energy {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-
+    #svOverview {
+      position: fixed;
+      inset: 0;
+      z-index: 99998;
+      display: none;
+      overflow: hidden;
+      color: #f8fafc;
+      background:
+        radial-gradient(ellipse at 50% 48%, rgba(91, 33, 182, .20), transparent 40%),
+        radial-gradient(ellipse at 50% 100%, rgba(6, 182, 212, .10), transparent 55%),
+        #050711;
+      font-family: 'Inter', sans-serif;
+    }
+
+    #svOverview.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: svFadeIn .7s ease both;
+    }
+
+    #svOverview::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: .18;
+      background-image:
+        linear-gradient(rgba(148, 163, 184, .08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(148, 163, 184, .08) 1px, transparent 1px);
+      background-size: 55px 55px;
+      mask-image: radial-gradient(ellipse, black, transparent 80%);
+    }
+
+    .sv-close {
+      position: absolute;
+      top: 24px;
+      right: 26px;
+      z-index: 20;
+      width: 44px;
+      height: 44px;
+      border: 1px solid rgba(255, 255, 255, .15);
+      border-radius: 14px;
+      color: #cbd5e1;
+      background: rgba(15, 23, 42, .65);
+      backdrop-filter: blur(12px);
+      cursor: pointer;
+      transition: .3s;
+    }
+
+    .sv-close:hover {
+      color: white;
+      border-color: #22d3ee;
+      transform: rotate(90deg);
+    }
+
+    .sv-heading {
+      position: absolute;
+      top: 8%;
+      width: 100%;
+      text-align: center;
+      opacity: 0;
+      animation: svTextIn 1s ease 0.4s forwards;
+    }
+
+    .sv-heading small {
+      color: #22d3ee;
+      font: 600 10px 'Fira Code', monospace;
+      letter-spacing: 5px;
+    }
+
+    .sv-heading h2 {
+      margin-top: 12px;
+      font-size: clamp(24px, 4vw, 42px);
+      font-weight: 900;
+      letter-spacing: -1.5px;
+    }
+
+    .sv-heading p {
+      margin-top: 9px;
+      color: #94a3b8;
+      font-size: 12px;
+      letter-spacing: 2px;
+    }
+
+    .sv-stage {
+      position: relative;
+      width: min(760px, 94vw);
+      height: min(590px, 76vh);
+      min-height: 390px;
+      margin-top: 35px;
+    }
+
+    .sv-energy {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
 
 
 
 
-.sv-node {
-  position: absolute;
-  z-index: 4;
-  width: 112px;
-  height: 112px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  border: 1px solid rgba(255,255,255,.13);
-  border-radius: 25px;
-  background: rgba(15,23,42,.72);
-  backdrop-filter: blur(15px);
-  box-shadow: 0 15px 50px rgba(0,0,0,.35);
-  opacity: 0;
-  transform: translateY(-100px) scale(.65);
-}
-
-.sv-node i {
-  font-size: 34px;
-  filter: drop-shadow(0 0 12px currentColor);
-}
-
-.sv-node span {
-  color: #cbd5e1;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 1px;
-}
-
-.sv-node-drive {
-  top: 5%;
-  left: 50%;
-  transform: translate(-50%, -100px) scale(.65);
-  color: #facc15;
-}
-
-.sv-node-pdf {
-  bottom: 7%;
-  left: 12%;
-  transform: translate(-70px, 70px) scale(.65);
-  color: #fb7185;
-}
-
-.sv-node-youtube {
-  bottom: 7%;
-  right: 12%;
-  transform: translate(70px, 70px) scale(.65);
-  color: #f87171;
-}
-
-#svOverview.active .sv-node-drive {
-  animation: svDriveEnter .9s cubic-bezier(.2,.8,.2,1) 1.2s forwards;
-}
-
-#svOverview.active .sv-node-pdf {
-  animation: svPdfEnter .9s cubic-bezier(.2,.8,.2,1) 1.6s forwards;
-}
-
-#svOverview.active .sv-node-youtube {
-  animation: svYoutubeEnter .9s cubic-bezier(.2,.8,.2,1) 2s forwards;
-}
-
-.sv-core {
-  position: absolute;
-  top: 49%;
-  left: 50%;
-  z-index: 5;
-  width: 145px;
-  height: 145px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 9px;
-  border-radius: 50%;
-  opacity: 0;
-  transform: translate(-50%, -50%) scale(.2);
-  background: radial-gradient(circle, rgba(124,58,237,.24), rgba(8,15,30,.95) 68%);
-  border: 1px solid rgba(34,211,238,.45);
-  box-shadow:
-    0 0 30px rgba(34,211,238,.18),
-    0 0 75px rgba(124,58,237,.25),
-    inset 0 0 25px rgba(34,211,238,.12);
-}
-
-#svOverview.active .sv-core {
-  animation: svCoreAppear 1.1s cubic-bezier(.16,1,.3,1) .2s forwards;
-}
-
-.sv-core::before,
-.sv-core::after {
-  content: "";
-  position: absolute;
-  inset: -12px;
-  border: 1px solid rgba(34,211,238,.45);
-  border-radius: 50%;
-  opacity: 0;
-}
-
-#svOverview.active .sv-core::before {
-  animation: svPulse 2.5s ease-out 5.3s infinite;
-}
-
-#svOverview.active .sv-core::after {
-  animation: svPulse 2.5s ease-out 6s infinite;
-}
-
-.sv-atom {
-  font-size: 58px;
-  line-height: 1;
-  color: #22d3ee;
-  filter: drop-shadow(0 0 13px rgba(34,211,238,.9));
-  animation: svAtomRotate 12s linear 6s infinite;
-}
-
-.sv-core strong {
-  font-size: 14px;
-  font-weight: 900;
-  letter-spacing: 1px;
-  background: linear-gradient(90deg,#c084fc,#22d3ee,#a3e635);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.sv-status {
-  position: absolute;
-  bottom: 3%;
-  width: 100%;
-  text-align: center;
-  color: #64748b;
-  font: 10px 'Fira Code', monospace;
-  letter-spacing: 3px;
-  opacity: 0;
-  animation: svTextIn .8s ease 5s forwards;
-}
-
-@keyframes svFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes svTextIn {
-  to { opacity: 1; }
-}
-
-@keyframes svDriveEnter {
-  to { opacity: 1; transform: translate(-50%, 0) scale(1); }
-}
-
-@keyframes svPdfEnter {
-  to { opacity: 1; transform: translate(0, 0) scale(1); }
-}
-
-@keyframes svYoutubeEnter {
-  to { opacity: 1; transform: translate(0, 0) scale(1); }
-}
-
-@keyframes svEnergyFlow {
-  0% { opacity: 0; stroke-dashoffset: 500; }
-  15% { opacity: 1; }
-  100% { opacity: 1; stroke-dashoffset: 0; }
-}
-
-@keyframes svCoreAppear {
-  0% { opacity: 0; transform: translate(-50%, -50%) scale(.2); }
-  65% { opacity: 1; transform: translate(-50%, -50%) scale(1.18); }
-  100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-}
-
-@keyframes svPulse {
-  0% { opacity: .8; transform: scale(.85); }
-  100% { opacity: 0; transform: scale(1.65); }
-}
-
-@keyframes svAtomRotate {
-  to { transform: rotate(360deg); }
-}
-
-@media(max-width:600px) {
-  .sv-stage {
-    width: 100vw;
-    height: 490px;
-    min-height: 0;
-    transform: scale(.86);
-  }
-
-  .sv-node {
-    width: 88px;
-    height: 88px;
-    border-radius: 20px;
-  }
-
-  .sv-node i { font-size: 27px; }
-  .sv-node span { font-size: 9px; }
-
-  .sv-node-pdf { left: 3%; }
-  .sv-node-youtube { right: 3%; }
-
-  .sv-core {
-    width: 125px;
-    height: 125px;
-  }
-
-  .sv-atom { font-size: 49px; }
-  .sv-heading { top: 9%; }
-}
-
-@media(prefers-reduced-motion:reduce) {
-  #svOverview *,
-  #svOverview *::before,
-  #svOverview *::after {
-    animation-duration: .01ms !important;
-    animation-iteration-count: 1 !important;
-  }
-}
-
-  /* ===== SciVault Energy Channels ===== */
-
-.sv-energy {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-  z-index: 2;
-  pointer-events: none;
-}
-
-.sv-draw-line {
-  fill: none;
-  stroke: url(#svGoldFlow);
-  stroke-width: 4;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-
-  opacity: 0;
-
-  filter:
-    drop-shadow(0 0 5px #facc15)
-    drop-shadow(0 0 12px #f59e0b);
-}
-
-#svOverview.active .drive-line {
-  animation: svDrawLine 2s ease-in-out 3s forwards;
-}
-
-#svOverview.active .pdf-line {
-  animation: svDrawLine 2.4s ease-in-out 3.3s forwards;
-}
-
-#svOverview.active .youtube-line {
-  animation: svDrawLine 2.4s ease-in-out 3.6s forwards;
-}
-
-@keyframes svDrawLine {
-  0% {
-    stroke-dashoffset: 1;
-    opacity: 0;
-  }
-
-  10% {
-    opacity: 1;
-  }
-
-  100% {
-    stroke-dashoffset: 0;
-    opacity: 1;
-  }
-}
-
-/* ===== End Energy Channels ===== */
-
-
-.sv-draw-line {
-  fill: none;
-  stroke: url(#svGoldFlow);
-  stroke-width: 3;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-
-  opacity: 0;
-  filter:
-    drop-shadow(0 0 5px #facc15)
-    drop-shadow(0 0 12px #f59e0b);
-}
-
-/* Draw each connection progressively */
-#svOverview.active .drive-line {
-  animation: svDrawLine 2s ease-in-out 3s forwards;
-}
-
-#svOverview.active .pdf-line {
-  animation: svDrawLine 2.4s ease-in-out 3.3s forwards;
-}
-
-#svOverview.active .youtube-line {
-  animation: svDrawLine 2.4s ease-in-out 3.6s forwards;
-}
-
-@keyframes svDrawLine {
-  0% {
-    stroke-dashoffset: 1;
-    opacity: 0;
-  }
-
-  10% {
-    opacity: .85;
-  }
-
-  100% {
-    stroke-dashoffset: 0;
-    opacity: 1;
-  }
-}
-
+    .sv-node {
+      position: absolute;
+      z-index: 4;
+      width: 112px;
+      height: 112px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      border: 1px solid rgba(255, 255, 255, .13);
+      border-radius: 25px;
+      background: rgba(15, 23, 42, .72);
+      backdrop-filter: blur(15px);
+      box-shadow: 0 15px 50px rgba(0, 0, 0, .35);
+      opacity: 0;
+      transform: translateY(-100px) scale(.65);
+    }
+
+    .sv-node i {
+      font-size: 34px;
+      filter: drop-shadow(0 0 12px currentColor);
+    }
+
+    .sv-node span {
+      color: #cbd5e1;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    .sv-node-drive {
+      top: 5%;
+      left: 50%;
+      transform: translate(-50%, -100px) scale(.65);
+      color: #facc15;
+    }
+
+    .sv-node-pdf {
+      bottom: 7%;
+      left: 12%;
+      transform: translate(-70px, 70px) scale(.65);
+      color: #fb7185;
+    }
+
+    .sv-node-youtube {
+      bottom: 7%;
+      right: 12%;
+      transform: translate(70px, 70px) scale(.65);
+      color: #f87171;
+    }
+
+    #svOverview.active .sv-node-drive {
+      animation: svDriveEnter .9s cubic-bezier(.2, .8, .2, 1) 1.2s forwards;
+    }
+
+    #svOverview.active .sv-node-pdf {
+      animation: svPdfEnter .9s cubic-bezier(.2, .8, .2, 1) 1.6s forwards;
+    }
+
+    #svOverview.active .sv-node-youtube {
+      animation: svYoutubeEnter .9s cubic-bezier(.2, .8, .2, 1) 2s forwards;
+    }
+
+    .sv-core {
+      position: absolute;
+      top: 49%;
+      left: 50%;
+      z-index: 5;
+      width: 145px;
+      height: 145px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      border-radius: 50%;
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(.2);
+      background: radial-gradient(circle, rgba(124, 58, 237, .24), rgba(8, 15, 30, .95) 68%);
+      border: 1px solid rgba(34, 211, 238, .45);
+      box-shadow:
+        0 0 30px rgba(34, 211, 238, .18),
+        0 0 75px rgba(124, 58, 237, .25),
+        inset 0 0 25px rgba(34, 211, 238, .12);
+    }
+
+    #svOverview.active .sv-core {
+      animation: svCoreAppear 1.1s cubic-bezier(.16, 1, .3, 1) .2s forwards;
+    }
+
+    .sv-core::before,
+    .sv-core::after {
+      content: "";
+      position: absolute;
+      inset: -12px;
+      border: 1px solid rgba(34, 211, 238, .45);
+      border-radius: 50%;
+      opacity: 0;
+    }
+
+    #svOverview.active .sv-core::before {
+      animation: svPulse 2.5s ease-out 5.3s infinite;
+    }
+
+    #svOverview.active .sv-core::after {
+      animation: svPulse 2.5s ease-out 6s infinite;
+    }
+
+    .sv-atom {
+      font-size: 58px;
+      line-height: 1;
+      color: #22d3ee;
+      filter: drop-shadow(0 0 13px rgba(34, 211, 238, .9));
+      animation: svAtomRotate 12s linear 6s infinite;
+    }
+
+    .sv-core strong {
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      background: linear-gradient(90deg, #c084fc, #22d3ee, #a3e635);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .sv-status {
+      position: absolute;
+      bottom: 3%;
+      width: 100%;
+      text-align: center;
+      color: #64748b;
+      font: 10px 'Fira Code', monospace;
+      letter-spacing: 3px;
+      opacity: 0;
+      animation: svTextIn .8s ease 5s forwards;
+    }
+
+    @keyframes svFadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes svTextIn {
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes svDriveEnter {
+      to {
+        opacity: 1;
+        transform: translate(-50%, 0) scale(1);
+      }
+    }
+
+    @keyframes svPdfEnter {
+      to {
+        opacity: 1;
+        transform: translate(0, 0) scale(1);
+      }
+    }
+
+    @keyframes svYoutubeEnter {
+      to {
+        opacity: 1;
+        transform: translate(0, 0) scale(1);
+      }
+    }
+
+    @keyframes svEnergyFlow {
+      0% {
+        opacity: 0;
+        stroke-dashoffset: 500;
+      }
+
+      15% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 1;
+        stroke-dashoffset: 0;
+      }
+    }
+
+    @keyframes svCoreAppear {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(.2);
+      }
+
+      65% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.18);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+    }
+
+    @keyframes svPulse {
+      0% {
+        opacity: .8;
+        transform: scale(.85);
+      }
+
+      100% {
+        opacity: 0;
+        transform: scale(1.65);
+      }
+    }
+
+    @keyframes svAtomRotate {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @media(max-width:600px) {
+      .sv-stage {
+        width: 100vw;
+        height: 490px;
+        min-height: 0;
+        transform: scale(.86);
+      }
+
+      .sv-node {
+        width: 88px;
+        height: 88px;
+        border-radius: 20px;
+      }
+
+      .sv-node i {
+        font-size: 27px;
+      }
+
+      .sv-node span {
+        font-size: 9px;
+      }
+
+      .sv-node-pdf {
+        left: 3%;
+      }
+
+      .sv-node-youtube {
+        right: 3%;
+      }
+
+      .sv-core {
+        width: 125px;
+        height: 125px;
+      }
+
+      .sv-atom {
+        font-size: 49px;
+      }
+
+      .sv-heading {
+        top: 9%;
+      }
+    }
+
+    @media(prefers-reduced-motion:reduce) {
+
+      #svOverview *,
+      #svOverview *::before,
+      #svOverview *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+      }
+    }
+
+    /* ===== SciVault Energy Channels ===== */
+
+    .sv-energy {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .sv-draw-line {
+      fill: none;
+      stroke: url(#svGoldFlow);
+      stroke-width: 4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+
+      opacity: 0;
+
+      filter:
+        drop-shadow(0 0 5px #facc15) drop-shadow(0 0 12px #f59e0b);
+    }
+
+    #svOverview.active .drive-line {
+      animation: svDrawLine 2s ease-in-out 3s forwards;
+    }
+
+    #svOverview.active .pdf-line {
+      animation: svDrawLine 2.4s ease-in-out 3.3s forwards;
+    }
+
+    #svOverview.active .youtube-line {
+      animation: svDrawLine 2.4s ease-in-out 3.6s forwards;
+    }
+
+    @keyframes svDrawLine {
+      0% {
+        stroke-dashoffset: 1;
+        opacity: 0;
+      }
+
+      10% {
+        opacity: 1;
+      }
+
+      100% {
+        stroke-dashoffset: 0;
+        opacity: 1;
+      }
+    }
+
+    /* ===== End Energy Channels ===== */
+
+
+    .sv-draw-line {
+      fill: none;
+      stroke: url(#svGoldFlow);
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+
+      opacity: 0;
+      filter:
+        drop-shadow(0 0 5px #facc15) drop-shadow(0 0 12px #f59e0b);
+    }
+
+    /* Draw each connection progressively */
+    #svOverview.active .drive-line {
+      animation: svDrawLine 2s ease-in-out 3s forwards;
+    }
+
+    #svOverview.active .pdf-line {
+      animation: svDrawLine 2.4s ease-in-out 3.3s forwards;
+    }
+
+    #svOverview.active .youtube-line {
+      animation: svDrawLine 2.4s ease-in-out 3.6s forwards;
+    }
+
+    @keyframes svDrawLine {
+      0% {
+        stroke-dashoffset: 1;
+        opacity: 0;
+      }
+
+      10% {
+        opacity: .85;
+      }
+
+      100% {
+        stroke-dashoffset: 0;
+        opacity: 1;
+      }
+    }
   </style>
 </head>
-<body class="min-h-screen flex flex-col custom-scrollbar overflow-x-hidden selection:bg-purple-500 selection:text-white grid-bg">
 
-    
+<body
+  class="min-h-screen flex flex-col custom-scrollbar overflow-x-hidden selection:bg-purple-500 selection:text-white grid-bg">
+
+
   <!-- SciVault Splash Screen -->
   <div id="scivaultSplash" role="status" aria-label="Chargement de SciVault">
     <div class="splash-content">
@@ -983,155 +1073,140 @@ document.addEventListener('keydown', function(event) {
   </div>
   <!-- End SciVault Splash Screen -->
 
-      <!-- =====================================
+  <!-- =====================================
      SCIVAULT — CINEMATIC GENERAL VIEW
 ===================================== -->
 
-<div id="svOverview" aria-hidden="true">
+  <div id="svOverview" aria-hidden="true">
 
-  <button class="sv-close"
-          onclick="closeSciVaultOverview()"
-          aria-label="Fermer la vue générale"
-          title="Retour au site">
-    <i class="fa-solid fa-xmark"></i>
-  </button>
+    <button class="sv-close" onclick="closeSciVaultOverview()" aria-label="Fermer la vue générale"
+      title="Retour au site">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
 
-  <div class="sv-heading">
-    <small>WELCOME TO THE SCIENCE UNIVERSE</small>
-    <h2>Explore. Discover. Connect.</h2>
-    <p>ALL YOUR SCIENTIFIC RESOURCES IN ONE PLACE</p>
+    <div class="sv-heading">
+      <small>WELCOME TO THE SCIENCE UNIVERSE</small>
+      <h2>Explore. Discover. Connect.</h2>
+      <p>ALL YOUR SCIENTIFIC RESOURCES IN ONE PLACE</p>
+    </div>
+
+    <div class="sv-stage">
+
+      <!-- Energy connections -->
+      <svg class="sv-energy" viewBox="0 0 760 590" preserveAspectRatio="none">
+
+        <defs>
+          <linearGradient id="svGoldFlow" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#22d3ee" />
+            <stop offset="50%" stop-color="#facc15" />
+            <stop offset="100%" stop-color="#f97316" />
+          </linearGradient>
+        </defs>
+
+        <path class="sv-draw-line drive-line" pathLength="1" d="M380 140 L350 165 L405 190 L365 220 L380 290" />
+
+        <path class="sv-draw-line pdf-line" pathLength="1"
+          d="M145 470 L185 445 L165 415 L230 390 L250 355 L310 345 L350 290" />
+
+        <path class="sv-draw-line youtube-line" pathLength="1"
+          d="M615 470 L575 445 L595 415 L530 390 L510 355 L450 345 L410 290" />
+
+      </svg>
+      <!-- Google Drive -->
+      <div class="sv-node sv-node-drive">
+        <i class="fa-brands fa-google-drive"></i>
+        <span>GOOGLE DRIVE</span>
+      </div>
+
+      <!-- PDF -->
+      <div class="sv-node sv-node-pdf">
+        <i class="fa-solid fa-file-pdf"></i>
+        <span>PDF ARCHIVES</span>
+      </div>
+
+      <!-- YouTube -->
+      <div class="sv-node sv-node-youtube">
+        <i class="fa-brands fa-youtube"></i>
+        <span>YOUTUBE</span>
+      </div>
+
+      <!-- SciVault central logo -->
+      <div class="sv-core">
+        <i class="fa-solid fa-atom sv-atom"></i>
+        <strong>SciVault</strong>
+      </div>
+
+      <div class="sv-status">
+        SCIENCE · DISCOVER · EXPLORE
+      </div>
+
+    </div>
   </div>
 
-  <div class="sv-stage">
-
-  <!-- Energy connections -->
-<svg class="sv-energy"
-     viewBox="0 0 760 590"
-     preserveAspectRatio="none">
-
-  <defs>
-    <linearGradient id="svGoldFlow" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#22d3ee"/>
-      <stop offset="50%" stop-color="#facc15"/>
-      <stop offset="100%" stop-color="#f97316"/>
-    </linearGradient>
-  </defs>
-
-  <path class="sv-draw-line drive-line"
-        pathLength="1"
-        d="M380 140 L350 165 L405 190 L365 220 L380 290"/>
-
-  <path class="sv-draw-line pdf-line"
-        pathLength="1"
-        d="M145 470 L185 445 L165 415 L230 390 L250 355 L310 345 L350 290"/>
-
-  <path class="sv-draw-line youtube-line"
-        pathLength="1"
-        d="M615 470 L575 445 L595 415 L530 390 L510 355 L450 345 L410 290"/>
-
-</svg>
-    <!-- Google Drive -->
-    <div class="sv-node sv-node-drive">
-      <i class="fa-brands fa-google-drive"></i>
-      <span>GOOGLE DRIVE</span>
-    </div>
-
-    <!-- PDF -->
-    <div class="sv-node sv-node-pdf">
-      <i class="fa-solid fa-file-pdf"></i>
-      <span>PDF ARCHIVES</span>
-    </div>
-
-    <!-- YouTube -->
-    <div class="sv-node sv-node-youtube">
-      <i class="fa-brands fa-youtube"></i>
-      <span>YOUTUBE</span>
-    </div>
-
-    <!-- SciVault central logo -->
-    <div class="sv-core">
-      <i class="fa-solid fa-atom sv-atom"></i>
-      <strong>SciVault</strong>
-    </div>
-
-    <div class="sv-status">
-      SCIENCE · DISCOVER · EXPLORE
-    </div>
-
-  </div>
-</div>
-
-<!-- END SCIVAULT GENERAL VIEW -->
+  <!-- END SCIVAULT GENERAL VIEW -->
 
 
   <!-- Header -->
   <header class="sticky top-0 z-40 glass-nav transition-all duration-300">
-  <div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 min-h-20 py-2 flex items-center justify-between gap-2 sm:gap-4">     
-  <div class="flex items-center gap-2 sm:gap-3 cursor-pointer group shrink min-w-0">
-        <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-purple-600 via-cyan-500 to-lime-400 p-0.5 flex items-center justify-center shadow-lg shadow-purple-500/20 group-hover:scale-105 transition-transform duration-300">
+    <div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 min-h-20 py-2 flex items-center justify-between gap-2 sm:gap-4">
+      <div class="flex items-center gap-2 sm:gap-3 cursor-pointer group shrink min-w-0">
+        <div
+          class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-purple-600 via-cyan-500 to-lime-400 p-0.5 flex items-center justify-center shadow-lg shadow-purple-500/20 group-hover:scale-105 transition-transform duration-300">
           <div class="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
             <i class="fa-solid fa-atom text-cyan-400 text-2xl animate-spin" style="animation-duration: 12s;"></i>
           </div>
         </div>
         <div>
           <span class="text-lg sm:text-2xl font-black tracking-tight gradient-text">SciVault</span>
-          <span class="hidden sm:block text-[10px] uppercase font-bold tracking-widest text-slate-400 -mt-1">Plateforme Scientifique Sécurisée</span>
+          <span class="hidden sm:block text-[10px] uppercase font-bold tracking-widest text-slate-400 -mt-1">Plateforme
+            Scientifique Sécurisée</span>
         </div>
       </div>
 
-  <div class="flex items-center gap-1 sm:gap-3 shrink-0">
+      <div class="flex items-center gap-1 sm:gap-3 shrink-0">
 
-     <button
-  id="enableNotificationsBtn"
-  onclick="activerNotifications()"
-  class="px-2 sm:px-3 py-2 sm:py-2.5 rounded-xl glass-card text-cyan-300 text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 border border-cyan-500/30"
-  title="Activer les notifications SciVault"
->
-  <i class="fa-solid fa-bell"></i>
-  <span class="hidden sm:inline">Notifications</span>
-</button>
-
-<!-- Vue Générale Button -->
-<button
-  id="generalViewBtn"
-  onclick="launchSciVaultOverview()"
-  class="px-2 sm:px-3 py-2 sm:py-2.5 rounded-xl glass-card text-purple-300 text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 border border-purple-500/30 hover:border-cyan-400/50 hover:text-cyan-300"
-  title="Découvrir SciVault"
-  aria-label="Ouvrir la vue générale de SciVault"
->
-  <i class="fa-solid fa-atom"></i>
-  <span class="hidden sm:inline">Vue Générale</span>
-</button>
-    
-  <button id="bookmarkedFilterBtn" onclick="toggleBookmarksOnly()" class="px-2 sm:px-4 py-2 sm:py-2.5 rounded-xl glass-card hover:bg-slate-800 text-slate-300 text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 border border-slate-700/50">
-          <i class="fa-solid fa-bookmark text-amber-400"></i>
-          <span class="hidden sm:inline">Mes Favoris</span>
-          <span id="bookmarkBadge" class="bg-amber-500/20 text-amber-300 text-xs px-2 py-0.5 rounded-full font-mono">0</span>
+        <button id="enableNotificationsBtn" onclick="activerNotifications()"
+          class="px-2 sm:px-3 py-2 sm:py-2.5 rounded-xl glass-card text-cyan-300 text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 border border-cyan-500/30"
+          title="Activer les notifications SciVault">
+          <i class="fa-solid fa-bell"></i>
+          <span class="hidden sm:inline">Notifications</span>
         </button>
 
-      
+        <!-- Vue Générale Button -->
+        <button id="generalViewBtn" onclick="launchSciVaultOverview()"
+          class="px-2 sm:px-3 py-2 sm:py-2.5 rounded-xl glass-card text-purple-300 text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 border border-purple-500/30 hover:border-cyan-400/50 hover:text-cyan-300"
+          title="Découvrir SciVault" aria-label="Ouvrir la vue générale de SciVault">
+          <i class="fa-solid fa-atom"></i>
+          <span class="hidden sm:inline">Vue Générale</span>
+        </button>
 
-       
-<button
-  onclick="requestAdminAccess()"
-  aria-label="Ajouter un article"
-  title="Ajouter un article"
-  class="w-10 h-10 sm:w-auto sm:h-auto sm:px-5 sm:py-2.5 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-500 hover:from-purple-500 hover:to-cyan-400 text-white font-bold text-xs sm:text-sm shadow-lg shadow-purple-500/25 transition-all flex items-center justify-center gap-2 border border-purple-400/30 group shrink-0"
->
-  <i class="fa-solid fa-plus-circle text-cyan-300 group-hover:rotate-90 transition-transform duration-300"></i>
+        <button id="bookmarkedFilterBtn" onclick="toggleBookmarksOnly()"
+          class="px-2 sm:px-4 py-2 sm:py-2.5 rounded-xl glass-card hover:bg-slate-800 text-slate-300 text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 border border-slate-700/50">
+          <i class="fa-solid fa-bookmark text-amber-400"></i>
+          <span class="hidden sm:inline">Mes Favoris</span>
+          <span id="bookmarkBadge"
+            class="bg-amber-500/20 text-amber-300 text-xs px-2 py-0.5 rounded-full font-mono">0</span>
+        </button>
 
-  <span class="hidden sm:inline">Ajouter Article</span>
 
-  <span class="hidden sm:inline text-[10px] bg-black/40 px-2 py-0.5 rounded-md text-cyan-300 font-mono">
-    <i class="fa-solid fa-lock text-[9px] mr-1"></i>ADMIN
-  </span>
-</button>
+
+
+        <button onclick="requestAdminAccess()" aria-label="Ajouter un article" title="Ajouter un article"
+          class="w-10 h-10 sm:w-auto sm:h-auto sm:px-5 sm:py-2.5 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-500 hover:from-purple-500 hover:to-cyan-400 text-white font-bold text-xs sm:text-sm shadow-lg shadow-purple-500/25 transition-all flex items-center justify-center gap-2 border border-purple-400/30 group shrink-0">
+          <i class="fa-solid fa-plus-circle text-cyan-300 group-hover:rotate-90 transition-transform duration-300"></i>
+
+          <span class="hidden sm:inline">Ajouter Article</span>
+
+          <span class="hidden sm:inline text-[10px] bg-black/40 px-2 py-0.5 rounded-md text-cyan-300 font-mono">
+            <i class="fa-solid fa-lock text-[9px] mr-1"></i>ADMIN
+          </span>
+        </button>
 
       </div>
     </div>
   </header>
 
-  
+
   </header>
 
   <!-- ===== SciVault Announcement ===== -->
@@ -1149,7 +1224,7 @@ document.addEventListener('keydown', function(event) {
 
       <!-- ✏️ بدل غير النص التالي ملي يكون إعلان جديد -->
       <p class="scivault-announcement-text">
-         استعن بالله
+        استعن بالله
       </p>
     </div>
   </div>
@@ -1158,659 +1233,731 @@ document.addEventListener('keydown', function(event) {
   <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
 
 
-  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
-    <!-- Hero Section -->
-    <section class="scroll-reveal relative overflow-hidden rounded-3xl p-8 sm:p-12 border border-slate-800 bg-gradient-to-b from-slate-900/90 via-slate-950/80 to-slate-900/90 shadow-2xl">
-      <div id="heroParticles" aria-hidden="true"></div>
-      <div class="relative z-10 max-w-3xl space-y-6">
-        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-300 text-xs font-semibold tracking-wide uppercase">
-          <span class="w-2 h-2 rounded-full bg-lime-400 animate-ping"></span>
-          Bibliothèque Scientifique Cloud
-        </div>
-        <h1 class="text-3xl sm:text-5xl font-black tracking-tight text-white leading-tight">
-          Espace d'Archives & <span class="gradient-text">Ressources Scientifiques</span>
-        </h1>
-        <p class="text-slate-400 text-sm sm:text-base leading-relaxed">
-          Plateforme organisée pour vos articles de recherche, fichiers PDF, dossiers Google Drive et liens web scientifiques.
-        </p>
-      </div>
-    </section>
-
-    <!-- Filters Section -->
-    <section class="space-y-6">
-      <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
-        <div class="relative w-full md:w-1/2">
-          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500">
-            <i class="fa-solid fa-magnifying-glass"></i>
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
+      <!-- Hero Section -->
+      <section
+        class="scroll-reveal relative overflow-hidden rounded-3xl p-8 sm:p-12 border border-slate-800 bg-gradient-to-b from-slate-900/90 via-slate-950/80 to-slate-900/90 shadow-2xl">
+        <div id="heroParticles" aria-hidden="true"></div>
+        <div class="relative z-10 max-w-3xl space-y-6">
+          <div
+            class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-300 text-xs font-semibold tracking-wide uppercase">
+            <span class="w-2 h-2 rounded-full bg-lime-400 animate-ping"></span>
+            Bibliothèque Scientifique Cloud
           </div>
-          <input type="text" id="searchInput" oninput="filterArticles()" placeholder="Rechercher par titre, résumé, mots-clés ou auteur..." class="w-full pl-11 pr-4 py-3 bg-slate-900/80 border border-slate-800 rounded-2xl focus:outline-none focus:border-cyan-500 text-slate-200 text-sm shadow-lg">
+          <h1 class="text-3xl sm:text-5xl font-black tracking-tight text-white leading-tight">
+            Espace d'Archives & <span class="gradient-text">Ressources Scientifiques</span>
+          </h1>
+          <p class="text-slate-400 text-sm sm:text-base leading-relaxed">
+            Plateforme organisée pour vos articles de recherche, fichiers PDF, dossiers Google Drive et liens web
+            scientifiques.
+          </p>
+        </div>
+      </section>
+
+      <!-- Filters Section -->
+      <section class="space-y-6">
+        <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
+          <div class="relative w-full md:w-1/2">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500">
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </div>
+            <input type="text" id="searchInput" oninput="filterArticles()"
+              placeholder="Rechercher par titre, résumé, mots-clés ou auteur..."
+              class="w-full pl-11 pr-4 py-3 bg-slate-900/80 border border-slate-800 rounded-2xl focus:outline-none focus:border-cyan-500 text-slate-200 text-sm shadow-lg">
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+            <button onclick="setMediaTypeFilter('all')" id="filter-all"
+              class="media-filter-btn active px-4 py-2.5 rounded-xl text-xs font-bold bg-purple-600 text-white shadow-lg border border-purple-500/50">Tout</button>
+            <button onclick="setMediaTypeFilter('pdf')" id="filter-pdf"
+              class="media-filter-btn px-4 py-2.5 rounded-xl text-xs font-bold bg-slate-900 text-slate-400 border border-slate-800"><i
+                class="fa-solid fa-file-pdf text-rose-400 mr-1.5"></i>PDF Direct</button>
+            <button onclick="setMediaTypeFilter('drive')" id="filter-drive"
+              class="media-filter-btn px-4 py-2.5 rounded-xl text-xs font-bold bg-slate-900 text-slate-400 border border-slate-800"><i
+                class="fa-brands fa-google-drive text-amber-400 mr-1.5"></i>Google Drive</button>
+            <button onclick="setMediaTypeFilter('link')" id="filter-link"
+              class="media-filter-btn px-4 py-2.5 rounded-xl text-xs font-bold bg-slate-900 text-slate-400 border border-slate-800"><i
+                class="fa-solid fa-link text-cyan-400 mr-1.5"></i>Lien Web</button>
+          </div>
         </div>
 
-        <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
-          <button onclick="setMediaTypeFilter('all')" id="filter-all" class="media-filter-btn active px-4 py-2.5 rounded-xl text-xs font-bold bg-purple-600 text-white shadow-lg border border-purple-500/50">Tout</button>
-          <button onclick="setMediaTypeFilter('pdf')" id="filter-pdf" class="media-filter-btn px-4 py-2.5 rounded-xl text-xs font-bold bg-slate-900 text-slate-400 border border-slate-800"><i class="fa-solid fa-file-pdf text-rose-400 mr-1.5"></i>PDF Direct</button>
-          <button onclick="setMediaTypeFilter('drive')" id="filter-drive" class="media-filter-btn px-4 py-2.5 rounded-xl text-xs font-bold bg-slate-900 text-slate-400 border border-slate-800"><i class="fa-brands fa-google-drive text-amber-400 mr-1.5"></i>Google Drive</button>
-          <button onclick="setMediaTypeFilter('link')" id="filter-link" class="media-filter-btn px-4 py-2.5 rounded-xl text-xs font-bold bg-slate-900 text-slate-400 border border-slate-800"><i class="fa-solid fa-link text-cyan-400 mr-1.5"></i>Lien Web</button>
-        </div>
-      </div>
+        <div class="flex items-center gap-2 overflow-x-auto pb-2 custom-scrollbar">
 
-      <div class="flex items-center gap-2 overflow-x-auto pb-2 custom-scrollbar">
-        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider mr-2 shrink-0"><i class="fa-solid fa-tags mr-1"></i>Thèmes:</span>
-        <div id="subjectTagsContainer" class="flex items-center gap-2 shrink-0"></div>
-      </div>
-    </section>
+          <div class="flex flex-wrap gap-3 items-center">
 
-    <!-- Articles Feed -->
-    <section>
-      <div class="flex items-center justify-between mb-6">
-        <div class="flex items-center gap-3">
-          <h2 class="text-xl font-bold text-white flex items-center gap-2">
-            <i class="fa-solid fa-layer-group text-purple-400"></i>
-            <span>Mes Articles & Documents</span>
-          </h2>
-          <span id="articleCountBadge" class="bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs px-2.5 py-1 rounded-full font-mono font-semibold">0</span>
-        </div>
-        <div class="text-xs text-slate-400 font-mono">
-          Statut: <span class="text-emerald-400 font-semibold">Synchronisé Cloud</span>
-        </div>
-      </div>
+            <select id="levelFilter" onchange="filterArticles()"
+              class="bg-slate-900 border border-slate-800 text-slate-300 text-sm rounded-xl px-4 py-2.5">
+              <option value="all"> niveaux</option>
+            </select>
 
-      <div id="articlesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            <select id="institutionFilter" onchange="filterArticles()"
+              class="bg-slate-900 border border-slate-800 text-slate-300 text-sm rounded-xl px-4 py-2.5">
+              <option value="all">établissements</option>
+            </select>
 
-      <div id="emptyState" class="text-center py-16 space-y-4 glass-card rounded-3xl border border-slate-800 hidden">
-        <div class="w-20 h-20 rounded-3xl bg-purple-500/10 text-purple-400 flex items-center justify-center mx-auto text-3xl border border-purple-500/20">
-          <i class="fa-solid fa-folder-plus"></i>
+          </div>
+          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider mr-2 shrink-0"><i
+              class="fa-solid fa-tags mr-1"></i>Thèmes:</span>
+          <div id="subjectTagsContainer" class="flex items-center gap-2 shrink-0"></div>
         </div>
-        <h3 class="text-xl font-bold text-white">Aucun article dans la base de données</h3>
-        <p class="text-slate-400 text-sm max-w-md mx-auto">
-          La bibliothèque est prête ! Ajoutez un article pour le partager avec tout le monde.
-        </p>
-        <button onclick="requestAdminAccess()" class="px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 text-white text-xs font-bold inline-flex items-center gap-2">
-          <i class="fa-solid fa-plus-circle"></i>
-          <span>Ajouter un Article</span>
-        </button>
-      </div>
-    </section>
-  </main>
+      </section>
+
+      <!-- Articles Feed -->
+      <section>
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center gap-3">
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-layer-group text-purple-400"></i>
+              <span>Mes Articles & Documents</span>
+            </h2>
+            <span id="articleCountBadge"
+              class="bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs px-2.5 py-1 rounded-full font-mono font-semibold">0</span>
+          </div>
+          <div class="text-xs text-slate-400 font-mono">
+            Statut: <span class="text-emerald-400 font-semibold">Synchronisé Cloud</span>
+          </div>
+        </div>
+
+        <div id="articlesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+        <div id="emptyState" class="text-center py-16 space-y-4 glass-card rounded-3xl border border-slate-800 hidden">
+          <div
+            class="w-20 h-20 rounded-3xl bg-purple-500/10 text-purple-400 flex items-center justify-center mx-auto text-3xl border border-purple-500/20">
+            <i class="fa-solid fa-folder-plus"></i>
+          </div>
+          <h3 class="text-xl font-bold text-white">Aucun article dans la base de données</h3>
+          <p class="text-slate-400 text-sm max-w-md mx-auto">
+            La bibliothèque est prête ! Ajoutez un article pour le partager avec tout le monde.
+          </p>
+          <button onclick="requestAdminAccess()"
+            class="px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 text-white text-xs font-bold inline-flex items-center gap-2">
+            <i class="fa-solid fa-plus-circle"></i>
+            <span>Ajouter un Article</span>
+          </button>
+        </div>
+      </section>
+    </main>
 
     <!-- Footer SciVault -->
-  <footer class="mt-auto border-t border-slate-800 bg-slate-950/80">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <footer class="mt-auto border-t border-slate-800 bg-slate-950/80">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-      <div class="flex flex-col md:flex-row items-center justify-between gap-8">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-8">
 
-        <!-- Contact Information -->
-        <div class="flex flex-col sm:flex-row items-center gap-6">
+          <!-- Contact Information -->
+          <div class="flex flex-col sm:flex-row items-center gap-6">
 
-          <!-- Email -->
-          <a
-            href="mailto:scivaultma@gmail.com"
-            class="flex items-center gap-3 group"
-            aria-label="Contacter SciVault par e-mail"
-          >
-            <div class="w-11 h-11 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors">
-              <i class="fa-solid fa-envelope text-cyan-400 text-lg"></i>
+            <!-- Email -->
+            <a href="mailto:scivaultma@gmail.com" class="flex items-center gap-3 group"
+              aria-label="Contacter SciVault par e-mail">
+              <div
+                class="w-11 h-11 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center group-hover:bg-cyan-500/20 transition-colors">
+                <i class="fa-solid fa-envelope text-cyan-400 text-lg"></i>
+              </div>
+
+              <div>
+                <p class="text-sm font-bold text-white">Email</p>
+                <p class="text-sm text-slate-400 group-hover:text-cyan-400 transition-colors">
+                  scivaultma@gmail.com
+                </p>
+              </div>
+            </a>
+
+            <!-- Facebook -->
+            <a href="https://web.facebook.com/profile.php?id=61594979295055" target="_blank" rel="noopener noreferrer"
+              class="flex items-center gap-3 group" aria-label="Visiter la page Facebook de SciVault Ma">
+              <div
+                class="w-11 h-11 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
+                <i class="fa-brands fa-facebook-f text-blue-400 text-lg"></i>
+              </div>
+
+              <div>
+                <p class="text-sm font-bold text-white">Facebook</p>
+                <p class="text-sm text-slate-400 group-hover:text-blue-400 transition-colors">
+                  SciVault Ma
+                </p>
+              </div>
+            </a>
+
+          </div>
+
+          <!-- Copyright -->
+          <div class="text-center md:text-right">
+            <p class="text-sm text-slate-400">
+              © 2026
+              <span class="font-bold gradient-text">SciVault</span>
+              — Tous droits réservés.
+            </p>
+
+            <p class="text-xs text-slate-500 mt-2">
+              Plateforme Scientifique & Archives de Recherche
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </footer>
+
+
+    <!-- Admin Modal -->
+    <div id="adminAuthModal"
+      class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+      <div class="glass-card max-w-md w-full rounded-3xl border border-slate-800 p-6 sm:p-8 space-y-6 relative">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-bold text-white">Espace Administrateur</h3>
+          <button type="button" onclick="closeModal('adminAuthModal')" class="text-slate-500 hover:text-white">
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
+        </div>
+
+        <form onsubmit="verifyAdminLogin(event)" class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-2">
+              Adresse e-mail
+            </label>
+            <input type="email" id="adminEmailInput" required autocomplete="username" placeholder="Votre e-mail"
+              class="w-full px-4 py-3 bg-slate-900 border border-slate-800 rounded-xl text-white text-sm">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-2">
+              Mot de passe
+            </label>
+            <input type="password" id="adminPasswordInput" required autocomplete="current-password"
+              placeholder="Votre mot de passe"
+              class="w-full px-4 py-3 bg-slate-900 border border-slate-800 rounded-xl text-white text-sm">
+          </div>
+
+          <p id="loginErrorMessage" class="hidden text-xs text-rose-400">
+            Connexion impossible. Vérifiez vos identifiants et vos autorisations.
+          </p>
+
+          <button type="submit"
+            class="w-full py-3 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 text-white text-sm font-bold">
+            Connexion
+          </button>
+        </form>
+      </div>
+    </div>
+
+
+    <!-- Add Article Modal -->
+    <div id="addArticleModal"
+      class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4 custom-scrollbar overflow-y-auto">
+      <div class="glass-card max-w-2xl w-full rounded-3xl border border-purple-500/30 p-6 sm:p-8 space-y-6 my-8">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+          <h3 class="text-xl font-bold text-white">Ajouter un Article</h3>
+          <button onclick="closeModal('addArticleModal')" class="text-slate-500 hover:text-white"><i
+              class="fa-solid fa-xmark text-lg"></i></button>
+        </div>
+
+        <form onsubmit="saveNewArticle(event)" class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Titre *</label>
+            <input type="text" id="newTitle" required
+              class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-white text-sm">
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">Domaine *</label>
+              <select id="newSubject" required onchange="toggleCustomDomainInput()"
+                class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700/80 rounded-xl text-white text-sm">
+                <option value="Intelligence Artificielle">Intelligence Artificielle</option>
+                <option value="Physique Quantique">Physique Quantique</option>
+                <option value="Biotechnologie">Biotechnologie</option>
+                <option value="Informatique & Réseaux">Informatique & Réseaux</option>
+                <option value="Mathématiques">Mathématiques</option>
+                <option value="Autre Domaine">Autre Domaine</option>
+              </select>
+              <input type="text" id="customDomainInput" placeholder="Saisissez le nom du domaine..."
+                class="hidden mt-2 w-full px-4 py-2 bg-slate-900 border border-cyan-500/50 rounded-xl text-cyan-300 text-sm">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">Auteur *</label>
+              <input type="text" id="newAuthor" required
+                class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-white text-sm">
+            </div>
+          </div>
+
+
+          <!-- Study Level & Institution -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">
+                Niveau d'étude
+              </label>
+              <input type="text" id="newLevel" placeholder="Ex: Bac+2, Licence, Master..."
+                class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-white text-sm">
             </div>
 
             <div>
-              <p class="text-sm font-bold text-white">Email</p>
-              <p class="text-sm text-slate-400 group-hover:text-cyan-400 transition-colors">
-                scivaultma@gmail.com
-              </p>
-            </div>
-          </a>
-
-          <!-- Facebook -->
-          <a
-            href="https://web.facebook.com/profile.php?id=61594979295055"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="flex items-center gap-3 group"
-            aria-label="Visiter la page Facebook de SciVault Ma"
-          >
-            <div class="w-11 h-11 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
-              <i class="fa-brands fa-facebook-f text-blue-400 text-lg"></i>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">
+                Université / Établissement
+              </label>
+              <input type="text" id="newInstitution" placeholder="Ex: FST Marrakech..."
+                class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-white text-sm">
             </div>
 
-            <div>
-              <p class="text-sm font-bold text-white">Facebook</p>
-              <p class="text-sm text-slate-400 group-hover:text-blue-400 transition-colors">
-                SciVault Ma
-              </p>
-            </div>
-          </a>
-
-        </div>
-
-        <!-- Copyright -->
-        <div class="text-center md:text-right">
-          <p class="text-sm text-slate-400">
-            © 2026
-            <span class="font-bold gradient-text">SciVault</span>
-            — Tous droits réservés.
-          </p>
-
-          <p class="text-xs text-slate-500 mt-2">
-            Plateforme Scientifique & Archives de Recherche
-          </p>
-        </div>
-
-      </div>
-    </div>
-  </footer>
-
- 
-<!-- Admin Modal -->
-<div id="adminAuthModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4">
-  <div class="glass-card max-w-md w-full rounded-3xl border border-slate-800 p-6 sm:p-8 space-y-6 relative">
-    <div class="flex items-center justify-between">
-      <h3 class="text-lg font-bold text-white">Espace Administrateur</h3>
-      <button type="button" onclick="closeModal('adminAuthModal')" class="text-slate-500 hover:text-white">
-        <i class="fa-solid fa-xmark text-lg"></i>
-      </button>
-    </div>
-
-    <form onsubmit="verifyAdminLogin(event)" class="space-y-4">
-      <div>
-        <label class="block text-xs font-semibold text-slate-300 mb-2">
-          Adresse e-mail
-        </label>
-        <input
-          type="email"
-          id="adminEmailInput"
-          required
-          autocomplete="username"
-          placeholder="Votre e-mail"
-          class="w-full px-4 py-3 bg-slate-900 border border-slate-800 rounded-xl text-white text-sm"
-        >
-      </div>
-
-      <div>
-        <label class="block text-xs font-semibold text-slate-300 mb-2">
-          Mot de passe
-        </label>
-        <input
-          type="password"
-          id="adminPasswordInput"
-          required
-          autocomplete="current-password"
-          placeholder="Votre mot de passe"
-          class="w-full px-4 py-3 bg-slate-900 border border-slate-800 rounded-xl text-white text-sm"
-        >
-      </div>
-
-      <p id="loginErrorMessage" class="hidden text-xs text-rose-400">
-        Connexion impossible. Vérifiez vos identifiants et vos autorisations.
-      </p>
-
-      <button
-        type="submit"
-        class="w-full py-3 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 text-white text-sm font-bold"
-      >
-        Connexion
-      </button>
-    </form>
-  </div>
-</div>
-
-
-  <!-- Add Article Modal -->
-  <div id="addArticleModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4 custom-scrollbar overflow-y-auto">
-    <div class="glass-card max-w-2xl w-full rounded-3xl border border-purple-500/30 p-6 sm:p-8 space-y-6 my-8">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-4">
-        <h3 class="text-xl font-bold text-white">Ajouter un Article</h3>
-        <button onclick="closeModal('addArticleModal')" class="text-slate-500 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-      </div>
-
-      <form onsubmit="saveNewArticle(event)" class="space-y-4">
-        <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Titre *</label>
-          <input type="text" id="newTitle" required class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-white text-sm">
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Domaine *</label>
-            <select id="newSubject" required onchange="toggleCustomDomainInput()" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700/80 rounded-xl text-white text-sm">
-              <option value="Intelligence Artificielle">Intelligence Artificielle</option>
-              <option value="Physique Quantique">Physique Quantique</option>
-              <option value="Biotechnologie">Biotechnologie</option>
-              <option value="Informatique & Réseaux">Informatique & Réseaux</option>
-              <option value="Mathématiques">Mathématiques</option>
-              <option value="Autre Domaine">Autre Domaine</option>
-            </select>
-            <input type="text" id="customDomainInput" placeholder="Saisissez le nom du domaine..." class="hidden mt-2 w-full px-4 py-2 bg-slate-900 border border-cyan-500/50 rounded-xl text-cyan-300 text-sm">
           </div>
+
+
           <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Auteur *</label>
-            <input type="text" id="newAuthor" required class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-white text-sm">
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Résumé *</label>
+            <textarea id="newAbstract" rows="3" required
+              class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-white text-sm"></textarea>
           </div>
-        </div>
 
-        <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Résumé *</label>
-          <textarea id="newAbstract" rows="3" required class="w-full px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-white text-sm"></textarea>
-        </div>
+          <div class="space-y-3 p-4 rounded-2xl bg-slate-900/60 border border-slate-800">
+            <h4 class="text-xs font-bold text-cyan-300 uppercase">Liens (Au moins 1)</h4>
+            <input type="url" id="newPdfUrl" placeholder="Lien PDF direct..."
+              class="w-full px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs font-mono text-white">
+            <input type="url" id="newDriveUrl" placeholder="Lien Google Drive..."
+              class="w-full px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs font-mono text-white">
+            <input type="url" id="newExternalUrl" placeholder="Lien Source / Site web..."
+              class="w-full px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs font-mono text-white">
+          </div>
 
-        <div class="space-y-3 p-4 rounded-2xl bg-slate-900/60 border border-slate-800">
-          <h4 class="text-xs font-bold text-cyan-300 uppercase">Liens (Au moins 1)</h4>
-          <input type="url" id="newPdfUrl" placeholder="Lien PDF direct..." class="w-full px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs font-mono text-white">
-          <input type="url" id="newDriveUrl" placeholder="Lien Google Drive..." class="w-full px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs font-mono text-white">
-          <input type="url" id="newExternalUrl" placeholder="Lien Source / Site web..." class="w-full px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs font-mono text-white">
-        </div>
-
-        <div class="flex justify-end gap-3 pt-2">
-          <button type="button" onclick="closeModal('addArticleModal')" class="px-4 py-2.5 rounded-xl bg-slate-800 text-slate-300 text-xs font-semibold">Annuler</button>
-          <button type="submit" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 text-white text-xs font-bold">Publier dans la Cloud</button>
-        </div>
-      </form>
+          <div class="flex justify-end gap-3 pt-2">
+            <button type="button" onclick="closeModal('addArticleModal')"
+              class="px-4 py-2.5 rounded-xl bg-slate-800 text-slate-300 text-xs font-semibold">Annuler</button>
+            <button type="submit"
+              class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 text-white text-xs font-bold">Publier
+              dans la Cloud</button>
+          </div>
+        </form>
+      </div>
     </div>
-  </div>
 
     <!-- Edit Article Modal -->
-<div id="editArticleModal"
-     class="fixed inset-0 z-[60] bg-slate-950/90 backdrop-blur-md hidden items-center justify-center p-4 overflow-y-auto">
+    <div id="editArticleModal"
+      class="fixed inset-0 z-[60] bg-slate-950/90 backdrop-blur-md hidden items-center justify-center p-4 overflow-y-auto">
 
-  <div class="glass-card max-w-2xl w-full rounded-3xl border border-cyan-500/30 p-6 sm:p-8 space-y-6 my-8">
+      <div class="glass-card max-w-2xl w-full rounded-3xl border border-cyan-500/30 p-6 sm:p-8 space-y-6 my-8">
 
-    <div class="flex items-center justify-between border-b border-slate-800 pb-4">
-      <div>
-        <h3 class="text-xl font-bold text-white">
-          <i class="fa-solid fa-pen-to-square text-cyan-400 mr-2"></i>
-          Modifier l'Article
-        </h3>
-        <p class="text-xs text-slate-400 mt-1">Admin Control Panel</p>
+        <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+          <div>
+            <h3 class="text-xl font-bold text-white">
+              <i class="fa-solid fa-pen-to-square text-cyan-400 mr-2"></i>
+              Modifier l'Article
+            </h3>
+            <p class="text-xs text-slate-400 mt-1">Admin Control Panel</p>
+          </div>
+
+          <button type="button" onclick="closeEditArticleModal()" class="text-slate-500 hover:text-white">
+            <i class="fa-solid fa-xmark text-xl"></i>
+          </button>
+        </div>
+
+        <form id="editArticleForm" onsubmit="updateArticle(event)" class="space-y-4">
+
+          <input type="hidden" id="editArticleId">
+
+          <!-- Title -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">
+              Titre *
+            </label>
+            <input type="text" id="editTitle" required
+              class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm">
+          </div>
+
+          <!-- Subject and Author -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">
+                Domaine *
+              </label>
+              <input type="text" id="editSubject" required
+                class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm">
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">
+                Auteur *
+              </label>
+              <input type="text" id="editAuthor" required
+                class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm">
+            </div>
+
+          </div>
+
+
+
+          <!-- Study Level & Institution -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">
+                Niveau d'étude
+              </label>
+              <input type="text" id="editLevel" placeholder="Ex: Bac+2, Licence, Master..."
+                class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm">
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1">
+                Université / Établissement
+              </label>
+              <input type="text" id="editInstitution" placeholder="Ex: FST Marrakech..."
+                class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm">
+            </div>
+
+          </div>
+
+
+          <!-- Abstract -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">
+              Résumé *
+            </label>
+            <textarea id="editAbstract" rows="4" required
+              class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm"></textarea>
+          </div>
+
+          <!-- Links -->
+          <div class="space-y-3 p-4 rounded-2xl bg-slate-900/60 border border-slate-800">
+
+            <h4 class="text-xs font-bold text-cyan-300 uppercase">
+              Modifier les liens
+            </h4>
+
+            <div>
+              <label class="text-xs text-slate-400">PDF Link</label>
+              <input type="url" id="editPdfUrl" placeholder="https://..."
+                class="w-full mt-1 px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs font-mono text-white">
+            </div>
+
+            <div>
+              <label class="text-xs text-slate-400">Google Drive Link</label>
+              <input type="url" id="editDriveUrl" placeholder="https://..."
+                class="w-full mt-1 px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs font-mono text-white">
+            </div>
+
+            <div>
+              <label class="text-xs text-slate-400">External Link / Website</label>
+              <input type="url" id="editExternalUrl" placeholder="https://..."
+                class="w-full mt-1 px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs font-mono text-white">
+            </div>
+
+          </div>
+
+          <!-- Date -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">
+              Date
+            </label>
+            <input type="text" id="editDate"
+              class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm">
+          </div>
+
+          <div class="flex flex-wrap justify-end gap-3 pt-3">
+
+            <button type="button" onclick="closeEditArticleModal()"
+              class="px-4 py-2.5 rounded-xl bg-slate-800 text-slate-300 text-xs font-semibold">
+              Annuler
+            </button>
+
+            <button type="submit" id="saveArticleChangesBtn"
+              class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 text-white text-xs font-bold">
+              <i class="fa-solid fa-floppy-disk mr-1"></i>
+              Save Changes
+            </button>
+
+          </div>
+
+        </form>
       </div>
-
-      <button type="button"
-              onclick="closeEditArticleModal()"
-              class="text-slate-500 hover:text-white">
-        <i class="fa-solid fa-xmark text-xl"></i>
-      </button>
     </div>
 
-    <form id="editArticleForm"
-          onsubmit="updateArticle(event)"
-          class="space-y-4">
+    <!-- JavaScript Firestore Logic -->
+    <script>
 
-      <input type="hidden" id="editArticleId">
+      let articles = [];
+      let isLoadingArticles = true;
+      let activeSubject = 'all';
+      let activeMediaType = 'all';
+      let searchQuery = '';
+      let activeLevel = 'all';
+      let activeInstitution = 'all';
+      let showBookmarksOnly = false;
+      let bookmarkedIds = new Set();
 
-      <!-- Title -->
-      <div>
-        <label class="block text-xs font-semibold text-slate-300 mb-1">
-          Titre *
-        </label>
-        <input type="text" id="editTitle" required
-               class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm">
-      </div>
 
-      <!-- Subject and Author -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      try {
+        bookmarkedIds = new Set(
+          JSON.parse(localStorage.getItem('scivault-bookmarks') || '[]')
+        );
+      } catch (error) {
+        bookmarkedIds = new Set();
+      }
 
-        <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">
-            Domaine *
-          </label>
-          <input type="text" id="editSubject" required
-                 class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm">
-        </div>
+      function toggleBookmark(id) {
+        if (bookmarkedIds.has(id)) {
+          bookmarkedIds.delete(id);
+        } else {
+          bookmarkedIds.add(id);
+        }
 
-        <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">
-            Auteur *
-          </label>
-          <input type="text" id="editAuthor" required
-                 class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm">
-        </div>
+        localStorage.setItem(
+          'scivault-bookmarks',
+          JSON.stringify([...bookmarkedIds])
+        );
 
-      </div>
+        updateBookmarkBadge();
+        renderArticles();
+      }
 
-      <!-- Abstract -->
-      <div>
-        <label class="block text-xs font-semibold text-slate-300 mb-1">
-          Résumé *
-        </label>
-        <textarea id="editAbstract" rows="4" required
-                  class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm"></textarea>
-      </div>
+      function toggleBookmarksOnly() {
+        showBookmarksOnly = !showBookmarksOnly;
 
-      <!-- Links -->
-      <div class="space-y-3 p-4 rounded-2xl bg-slate-900/60 border border-slate-800">
+        const btn = document.getElementById('bookmarkedFilterBtn');
+        btn.classList.toggle('ring-2', showBookmarksOnly);
+        btn.classList.toggle('ring-amber-400', showBookmarksOnly);
 
-        <h4 class="text-xs font-bold text-cyan-300 uppercase">
-          Modifier les liens
-        </h4>
+        renderArticles();
+      }
 
-        <div>
-          <label class="text-xs text-slate-400">PDF Link</label>
-          <input type="url" id="editPdfUrl"
-                 placeholder="https://..."
-                 class="w-full mt-1 px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs font-mono text-white">
-        </div>
+      function updateBookmarkBadge() {
+        document.getElementById('bookmarkBadge').textContent =
+          bookmarkedIds.size;
+      }
 
-        <div>
-          <label class="text-xs text-slate-400">Google Drive Link</label>
-          <input type="url" id="editDriveUrl"
-                 placeholder="https://..."
-                 class="w-full mt-1 px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs font-mono text-white">
-        </div>
+      updateBookmarkBadge();
 
-        <div>
-          <label class="text-xs text-slate-400">External Link / Website</label>
-          <input type="url" id="editExternalUrl"
-                 placeholder="https://..."
-                 class="w-full mt-1 px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs font-mono text-white">
-        </div>
 
-      </div>
+      let isAdminLoggedIn = false;
 
-      <!-- Date -->
-      <div>
-        <label class="block text-xs font-semibold text-slate-300 mb-1">
-          Date
-        </label>
-        <input type="text" id="editDate"
-               class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm">
-      </div>
+      // 1. LISTEN TO FIRESTORE REALTIME UPDATES
+      db.collection("articles").onSnapshot((snapshot) => {
+        articles = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
 
-      <div class="flex flex-wrap justify-end gap-3 pt-3">
+        // Sort by newest created
+        articles.sort((a, b) => {
+          const timeA = a.createdAt ? a.createdAt.seconds : 0;
+          const timeB = b.createdAt ? b.createdAt.seconds : 0;
+          return timeB - timeA;
+        });
 
-        <button type="button"
-                onclick="closeEditArticleModal()"
-                class="px-4 py-2.5 rounded-xl bg-slate-800 text-slate-300 text-xs font-semibold">
-          Annuler
-        </button>
+        isLoadingArticles = false;
 
-        <button type="submit"
-                id="saveArticleChangesBtn"
-                class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 text-white text-xs font-bold">
-          <i class="fa-solid fa-floppy-disk mr-1"></i>
-          Save Changes
-        </button>
-
-      </div>
-
-    </form>
-  </div>
-</div>
-
-  <!-- JavaScript Firestore Logic -->
-  <script>
-
-    let articles = [];
-    let isLoadingArticles = true;
-    let activeSubject = 'all';
-    let activeMediaType = 'all';
-    let searchQuery = '';
-    let showBookmarksOnly = false;
-    let bookmarkedIds = new Set();
-
-    
-try {
-  bookmarkedIds = new Set(
-    JSON.parse(localStorage.getItem('scivault-bookmarks') || '[]')
-  );
-} catch (error) {
-  bookmarkedIds = new Set();
-}
-
-function toggleBookmark(id) {
-  if (bookmarkedIds.has(id)) {
-    bookmarkedIds.delete(id);
-  } else {
-    bookmarkedIds.add(id);
-  }
-
-  localStorage.setItem(
-    'scivault-bookmarks',
-    JSON.stringify([...bookmarkedIds])
-  );
-
-  updateBookmarkBadge();
-  renderArticles();
-}
-
-function toggleBookmarksOnly() {
-  showBookmarksOnly = !showBookmarksOnly;
-
-  const btn = document.getElementById('bookmarkedFilterBtn');
-  btn.classList.toggle('ring-2', showBookmarksOnly);
-  btn.classList.toggle('ring-amber-400', showBookmarksOnly);
-
-  renderArticles();
-}
-
-function updateBookmarkBadge() {
-  document.getElementById('bookmarkBadge').textContent =
-    bookmarkedIds.size;
-}
-
-updateBookmarkBadge();
-
-    
-    let isAdminLoggedIn = false;
-
-    // 1. LISTEN TO FIRESTORE REALTIME UPDATES
-    db.collection("articles").onSnapshot((snapshot) => {
-      articles = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-
-      // Sort by newest created
-      articles.sort((a, b) => {
-        const timeA = a.createdAt ? a.createdAt.seconds : 0;
-        const timeB = b.createdAt ? b.createdAt.seconds : 0;
-        return timeB - timeA;
+        renderSubjectTags();
+        renderDynamicFilters();
+        renderArticles();
+      }, (error) => {
+        console.error("Erreur Firestore :", error);
       });
 
-      isLoadingArticles = false;
+      // 2. SAVE ARTICLE TO FIRESTORE
+      function saveNewArticle(event) {
+        event.preventDefault();
 
-      renderSubjectTags();
-      renderArticles();
-    }, (error) => {
-      console.error("Erreur Firestore :", error);
-    });
+        const domainSelectValue = document.getElementById('newSubject').value;
+        const customDomainValue = document.getElementById('customDomainInput').value.trim();
+        const finalDomain = (domainSelectValue === 'Autre Domaine' && customDomainValue !== '') ? customDomainValue : domainSelectValue;
 
-    // 2. SAVE ARTICLE TO FIRESTORE
-    function saveNewArticle(event) {
-      event.preventDefault();
+        const pdfUrl = document.getElementById('newPdfUrl').value.trim();
+        const driveUrl = document.getElementById('newDriveUrl').value.trim();
+        const externalUrl = document.getElementById('newExternalUrl').value.trim();
 
-      const domainSelectValue = document.getElementById('newSubject').value;
-      const customDomainValue = document.getElementById('customDomainInput').value.trim();
-      const finalDomain = (domainSelectValue === 'Autre Domaine' && customDomainValue !== '') ? customDomainValue : domainSelectValue;
+        if (!pdfUrl && !driveUrl && !externalUrl) {
+          alert("Veuillez fournir au moins un lien.");
+          return;
+        }
 
-      const pdfUrl = document.getElementById('newPdfUrl').value.trim();
-      const driveUrl = document.getElementById('newDriveUrl').value.trim();
-      const externalUrl = document.getElementById('newExternalUrl').value.trim();
+        const newArticle = {
+          title: document.getElementById('newTitle').value.trim(),
+          subject: finalDomain,
+          author: document.getElementById('newAuthor').value.trim(),
+          level: document.getElementById('newLevel').value.trim(),
+          institution: document.getElementById('newInstitution').value.trim(),
+          abstract: document.getElementById('newAbstract').value.trim(),
+          pdfUrl: pdfUrl,
+          driveUrl: driveUrl,
+          externalUrl: externalUrl,
+          date: new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }),
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
 
-      if (!pdfUrl && !driveUrl && !externalUrl) {
-        alert("Veuillez fournir au moins un lien.");
-        return;
+        db.collection("articles").add(newArticle)
+          .then(() => {
+            closeModal('addArticleModal');
+            event.target.reset();
+          })
+          .catch((error) => {
+            console.error("Erreur d'ajout :", error);
+            alert("Erreur lors de la publication.");
+          });
       }
 
-      const newArticle = {
-        title: document.getElementById('newTitle').value.trim(),
-        subject: finalDomain,
-        author: document.getElementById('newAuthor').value.trim(),
-        abstract: document.getElementById('newAbstract').value.trim(),
-        pdfUrl: pdfUrl,
-        driveUrl: driveUrl,
-        externalUrl: externalUrl,
-        date: new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }),
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      };
+      // ==========================================
+      // SCIVAULT — ADMIN ARTICLE EDIT SYSTEM
+      // ==========================================
 
-      db.collection("articles").add(newArticle)
-        .then(() => {
-          closeModal('addArticleModal');
-          event.target.reset();
-        })
-        .catch((error) => {
-          console.error("Erreur d'ajout :", error);
-          alert("Erreur lors de la publication.");
-        });
-    }
+      // Open Edit Modal and Load Article Data
+      async function openEditArticle(articleId) {
 
-    // ==========================================
-// SCIVAULT — ADMIN ARTICLE EDIT SYSTEM
-// ==========================================
+        if (!isAdminLoggedIn || !auth.currentUser) {
+          alert("Accès réservé à l'administrateur.");
+          return;
+        }
 
-// Open Edit Modal and Load Article Data
-async function openEditArticle(articleId) {
+        const authorized = await checkAdminRole(auth.currentUser);
 
-  if (!isAdminLoggedIn || !auth.currentUser) {
-    alert("Accès réservé à l'administrateur.");
-    return;
-  }
+        if (!authorized) {
+          alert("Accès refusé.");
+          return;
+        }
 
-  const authorized = await checkAdminRole(auth.currentUser);
+        const article = articles.find(a => a.id === articleId);
 
-  if (!authorized) {
-    alert("Accès refusé.");
-    return;
-  }
+        if (!article) {
+          alert("Article introuvable.");
+          return;
+        }
 
-  const article = articles.find(a => a.id === articleId);
+        // Fill the form with current data
+        document.getElementById('editArticleId').value = article.id;
+        document.getElementById('editTitle').value = article.title || '';
+        document.getElementById('editSubject').value = article.subject || '';
+        document.getElementById('editAuthor').value = article.author || '';
+        document.getElementById('editLevel').value = article.level || '';
+        document.getElementById('editInstitution').value = article.institution || '';
+        document.getElementById('editAbstract').value = article.abstract || '';
 
-  if (!article) {
-    alert("Article introuvable.");
-    return;
-  }
+        document.getElementById('editPdfUrl').value = article.pdfUrl || '';
+        document.getElementById('editDriveUrl').value = article.driveUrl || '';
+        document.getElementById('editExternalUrl').value = article.externalUrl || '';
 
-  // Fill the form with current data
-  document.getElementById('editArticleId').value = article.id;
-  document.getElementById('editTitle').value = article.title || '';
-  document.getElementById('editSubject').value = article.subject || '';
-  document.getElementById('editAuthor').value = article.author || '';
-  document.getElementById('editAbstract').value = article.abstract || '';
+        document.getElementById('editDate').value = article.date || '';
 
-  document.getElementById('editPdfUrl').value = article.pdfUrl || '';
-  document.getElementById('editDriveUrl').value = article.driveUrl || '';
-  document.getElementById('editExternalUrl').value = article.externalUrl || '';
+        const modal = document.getElementById('editArticleModal');
 
-  document.getElementById('editDate').value = article.date || '';
-
-  const modal = document.getElementById('editArticleModal');
-
-  modal.classList.remove('hidden');
-  modal.classList.add('flex');
-}
-
-
-// Save Article Changes
-async function updateArticle(event) {
-
-  event.preventDefault();
-
-  if (!isAdminLoggedIn || !auth.currentUser) {
-    alert("Accès réservé à l'administrateur.");
-    return;
-  }
-
-  const authorized = await checkAdminRole(auth.currentUser);
-
-  if (!authorized) {
-    alert("Vous n'avez pas les autorisations nécessaires.");
-    return;
-  }
-
-  const articleId = document.getElementById('editArticleId').value;
-
-  const pdfUrl = document.getElementById('editPdfUrl').value.trim();
-  const driveUrl = document.getElementById('editDriveUrl').value.trim();
-  const externalUrl = document.getElementById('editExternalUrl').value.trim();
-
-  // At least one link is required
-  if (!pdfUrl && !driveUrl && !externalUrl) {
-    alert("Veuillez conserver au moins un lien.");
-    return;
-  }
-
-  const updatedArticle = {
-    title: document.getElementById('editTitle').value.trim(),
-    subject: document.getElementById('editSubject').value.trim(),
-    author: document.getElementById('editAuthor').value.trim(),
-    abstract: document.getElementById('editAbstract').value.trim(),
-
-    pdfUrl: pdfUrl,
-    driveUrl: driveUrl,
-    externalUrl: externalUrl,
-
-    date: document.getElementById('editDate').value.trim()
-  };
-
-  if (
-    !updatedArticle.title ||
-    !updatedArticle.subject ||
-    !updatedArticle.author ||
-    !updatedArticle.abstract
-  ) {
-    alert("Veuillez remplir tous les champs obligatoires.");
-    return;
-  }
-
-  const saveButton = document.getElementById('saveArticleChangesBtn');
-
-  saveButton.disabled = true;
-  saveButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
-
-  try {
-
-    await db.collection("articles")
-      .doc(articleId)
-      .update(updatedArticle);
-
-    alert("Article modifié avec succès !");
-
-    closeEditArticleModal();
-
-  } catch (error) {
-
-    console.error("Erreur modification article :", error);
-
-    alert("Erreur lors de la modification : " + error.message);
-
-  } finally {
-
-    saveButton.disabled = false;
-
-    saveButton.innerHTML =
-      '<i class="fa-solid fa-floppy-disk mr-1"></i> Save Changes';
-
-  }
-}
-
-
-// Close Edit Modal
-function closeEditArticleModal() {
-
-  const modal = document.getElementById('editArticleModal');
-
-  modal.classList.add('hidden');
-  modal.classList.remove('flex');
-
-}
-
-    // 3. DELETE ARTICLE FROM FIRESTORE
-    function deleteArticle(artId) {
-      if (confirm("Voulez-vous vraiment supprimer cet article ?")) {
-        db.collection("articles").doc(artId).delete()
-          .catch(err => console.error("Erreur suppression:", err));
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
       }
-    }
 
-    // Render logic
-    function renderArticles() {
-      const grid = document.getElementById('articlesGrid');
-      const emptyState = document.getElementById('emptyState');
-      if (!grid) return;
 
-      
-if (isLoadingArticles) {
-  emptyState.classList.add('hidden');
+      // Save Article Changes
+      async function updateArticle(event) {
 
-  grid.innerHTML = Array.from({ length: 6 }, () => `
+        event.preventDefault();
+
+        if (!isAdminLoggedIn || !auth.currentUser) {
+          alert("Accès réservé à l'administrateur.");
+          return;
+        }
+
+        const authorized = await checkAdminRole(auth.currentUser);
+
+        if (!authorized) {
+          alert("Vous n'avez pas les autorisations nécessaires.");
+          return;
+        }
+
+        const articleId = document.getElementById('editArticleId').value;
+
+        const pdfUrl = document.getElementById('editPdfUrl').value.trim();
+        const driveUrl = document.getElementById('editDriveUrl').value.trim();
+        const externalUrl = document.getElementById('editExternalUrl').value.trim();
+
+        // At least one link is required
+        if (!pdfUrl && !driveUrl && !externalUrl) {
+          alert("Veuillez conserver au moins un lien.");
+          return;
+        }
+
+        const updatedArticle = {
+          title: document.getElementById('editTitle').value.trim(),
+          subject: document.getElementById('editSubject').value.trim(),
+          author: document.getElementById('editAuthor').value.trim(),
+          level: document.getElementById('editLevel').value.trim(),
+          institution: document.getElementById('editInstitution').value.trim(),
+          abstract: document.getElementById('editAbstract').value.trim(),
+
+          pdfUrl: pdfUrl,
+          driveUrl: driveUrl,
+          externalUrl: externalUrl,
+
+          date: document.getElementById('editDate').value.trim()
+        };
+
+        if (
+          !updatedArticle.title ||
+          !updatedArticle.subject ||
+          !updatedArticle.author ||
+          !updatedArticle.abstract
+        ) {
+          alert("Veuillez remplir tous les champs obligatoires.");
+          return;
+        }
+
+        const saveButton = document.getElementById('saveArticleChangesBtn');
+
+        saveButton.disabled = true;
+        saveButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+
+        try {
+
+          await db.collection("articles")
+            .doc(articleId)
+            .update(updatedArticle);
+
+          alert("Article modifié avec succès !");
+
+          closeEditArticleModal();
+
+        } catch (error) {
+
+          console.error("Erreur modification article :", error);
+
+          alert("Erreur lors de la modification : " + error.message);
+
+        } finally {
+
+          saveButton.disabled = false;
+
+          saveButton.innerHTML =
+            '<i class="fa-solid fa-floppy-disk mr-1"></i> Save Changes';
+
+        }
+      }
+
+
+      // Close Edit Modal
+      function closeEditArticleModal() {
+
+        const modal = document.getElementById('editArticleModal');
+
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+
+      }
+
+      // 3. DELETE ARTICLE FROM FIRESTORE
+      function deleteArticle(artId) {
+        if (confirm("Voulez-vous vraiment supprimer cet article ?")) {
+          db.collection("articles").doc(artId).delete()
+            .catch(err => console.error("Erreur suppression:", err));
+        }
+      }
+
+      // Render logic
+      function renderArticles() {
+        const grid = document.getElementById('articlesGrid');
+        const emptyState = document.getElementById('emptyState');
+        if (!grid) return;
+
+
+        if (isLoadingArticles) {
+          emptyState.classList.add('hidden');
+
+          grid.innerHTML = Array.from({ length: 6 }, () => `
     <div class="glass-card rounded-2xl p-6 space-y-5" aria-hidden="true">
       <div class="flex items-center justify-between gap-3">
         <div class="skeleton-shimmer h-6 w-32 rounded-full"></div>
@@ -1836,38 +1983,42 @@ if (isLoadingArticles) {
     </div>
   `).join('');
 
-  return;
-}
+          return;
+        }
 
 
-      const filtered = articles.filter(art => {
-        const matchesSearch = searchQuery === '' || 
-          art.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          art.abstract.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          art.author.toLowerCase().includes(searchQuery.toLowerCase());
+        const filtered = articles.filter(art => {
+          const matchesSearch = searchQuery === '' ||
+            art.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            art.abstract.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            art.author.toLowerCase().includes(searchQuery.toLowerCase());
 
-        const matchesSubject = activeSubject === 'all' || art.subject === activeSubject;
+          const matchesSubject = activeSubject === 'all' || art.subject === activeSubject;
 
-        let matchesMedia = true;
-        if (activeMediaType === 'pdf') matchesMedia = !!art.pdfUrl;
-        if (activeMediaType === 'drive') matchesMedia = !!art.driveUrl;
-        if (activeMediaType === 'link') matchesMedia = !!art.externalUrl;
+          let matchesMedia = true;
+          if (activeMediaType === 'pdf') matchesMedia = !!art.pdfUrl;
+          if (activeMediaType === 'drive') matchesMedia = !!art.driveUrl;
+          if (activeMediaType === 'link') matchesMedia = !!art.externalUrl;
 
-        const matchesBookmark = !showBookmarksOnly || bookmarkedIds.has(art.id);
+          const matchesBookmark = !showBookmarksOnly || bookmarkedIds.has(art.id);
 
-        return matchesSearch && matchesSubject && matchesMedia && matchesBookmark;
-      });
+          const matchesLevel = activeLevel === 'all' || art.level === activeLevel;
 
-      document.getElementById('articleCountBadge').innerText = filtered.length;
+          const matchesInstitution = activeInstitution === 'all' || art.institution === activeInstitution;
 
-      if (filtered.length === 0) {
-        grid.innerHTML = '';
-        emptyState.classList.remove('hidden');
-        return;
-      }
+          return matchesSearch && matchesSubject && matchesMedia && matchesBookmark && matchesLevel && matchesInstitution;
+        });
 
-      emptyState.classList.add('hidden');
-      grid.innerHTML = filtered.map(art => `
+        document.getElementById('articleCountBadge').innerText = filtered.length;
+
+        if (filtered.length === 0) {
+          grid.innerHTML = '';
+          emptyState.classList.remove('hidden');
+          return;
+        }
+
+        emptyState.classList.add('hidden');
+        grid.innerHTML = filtered.map(art => `
         <div class="scroll-reveal glass-card rounded-2xl p-6 flex flex-col justify-between space-y-5 relative">
           <div class="space-y-3">
            
@@ -1913,261 +2064,303 @@ ${isAdminLoggedIn ? `
           </div>
         </div>
       `).join('');
-      
-observeRevealElements(
-  grid.querySelectorAll('.scroll-reveal')
-);
 
-    }
+        observeRevealElements(
+          grid.querySelectorAll('.scroll-reveal')
+        );
 
-    function renderSubjectTags() {
-      const subjects = ['all', ...new Set(articles.map(a => a.subject))];
-      const container = document.getElementById('subjectTagsContainer');
-      if (!container) return;
-      container.innerHTML = subjects.map(subj => `
+      }
+
+      function renderSubjectTags() {
+        const subjects = ['all', ...new Set(articles.map(a => a.subject))];
+        const container = document.getElementById('subjectTagsContainer');
+        if (!container) return;
+        container.innerHTML = subjects.map(subj => `
         <button onclick="setSubjectFilter('${subj}')" class="px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${activeSubject === subj ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/50' : 'bg-slate-900/80 text-slate-400 border-slate-800'}">
           ${subj === 'all' ? 'Tous les sujets' : subj}
         </button>
       `).join('');
-    }
-
-    function toggleCustomDomainInput() {
-      const domainSelect = document.getElementById('newSubject');
-      const customInput = document.getElementById('customDomainInput');
-      if (domainSelect.value === 'Autre Domaine') {
-        customInput.classList.remove('hidden');
-      } else {
-        customInput.classList.add('hidden');
-        customInput.value = '';
-      }
-    }
-
-   
-async function checkAdminRole(user) {
-  if (!user) return false;
-
-  try {
-    const adminDoc = await db.collection("admins").doc(user.uid).get();
-    return adminDoc.exists && adminDoc.data().role === "admin";
-  } catch (error) {
-    console.error("Erreur admin :", error);
-    return false;
-  }
-}
-
-auth.onAuthStateChanged(async (user) => {
-  isAdminLoggedIn = await checkAdminRole(user);
-  renderArticles();
-});
-
-async function verifyAdminLogin(e) {
-  e.preventDefault();
-
-  const email = document.getElementById('adminEmailInput').value.trim();
-  const password = document.getElementById('adminPasswordInput').value;
-  const errorMessage = document.getElementById('loginErrorMessage');
-
-  errorMessage.classList.add('hidden');
-
-  try {
-    const credential = await auth.signInWithEmailAndPassword(email, password);
-    const authorized = await checkAdminRole(credential.user);
-
-    if (!authorized) {
-      await auth.signOut();
-      errorMessage.textContent = "Ce compte n'a pas les autorisations administrateur.";
-      errorMessage.classList.remove('hidden');
-      return;
-    }
-
-    isAdminLoggedIn = true;
-    closeModal('adminAuthModal');
-    openModal('addArticleModal');
-    renderArticles();
-
-  } catch (error) {
-    console.error(error);
-    errorMessage.textContent = "Connexion impossible. Vérifiez vos identifiants.";
-    errorMessage.classList.remove('hidden');
-  }
-}
-
-
-    function requestAdminAccess() {
-      if (isAdminLoggedIn) openModal('addArticleModal');
-      else openModal('adminAuthModal');
-    }
-    function setSubjectFilter(s) { activeSubject = s; renderSubjectTags(); renderArticles(); }
-
-function setMediaTypeFilter(m) {
-  activeMediaType = m;
-
-  document.querySelectorAll('.media-filter-btn').forEach(btn => {
-    const isActive = btn.id === `filter-${m}`;
-
-    btn.classList.toggle('active', isActive);
-
-    if (isActive) {
-      btn.className =
-        'media-filter-btn active px-4 py-2.5 rounded-xl text-xs font-bold bg-purple-600 text-white shadow-lg border border-purple-500/50';
-    } else {
-      btn.className =
-        'media-filter-btn px-4 py-2.5 rounded-xl text-xs font-bold bg-slate-900 text-slate-400 border border-slate-800';
-    }
-  });
-
-  renderArticles();
-}
-    function filterArticles() { searchQuery = document.getElementById('searchInput').value; renderArticles(); }
-    function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
-    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
-    
-    // Interactive Canvas Particles Implementation
-    (function initInteractiveParticles() {
-      const container = document.getElementById('heroParticles');
-      if (!container) return;
-
-      const canvas = document.createElement('canvas');
-      container.appendChild(canvas);
-      const ctx = canvas.getContext('2d');
-
-      let width, height;
-      let particles = [];
-      const mouse = { x: -1000, y: -1000, radius: 120 };
-
-      const colors = ['#A855F7', '#06B6D4', '#84CC16'];
-
-      function resize() {
-        width = canvas.width = container.offsetWidth;
-        height = canvas.height = container.offsetHeight;
       }
 
-      window.addEventListener('resize', resize);
-      resize();
+      function renderDynamicFilters() {
+        const levelSelect = document.getElementById('levelFilter');
+        const institutionSelect = document.getElementById('institutionFilter');
 
-      container.addEventListener('mousemove', (e) => {
-        const rect = container.getBoundingClientRect();
-        mouse.x = e.clientX - rect.left;
-        mouse.y = e.clientY - rect.top;
+        if (!levelSelect || !institutionSelect) return;
+
+        const previousLevel = activeLevel;
+        const previousInstitution = activeInstitution;
+
+        const levels = [...new Set(
+          articles.map(art => art.level).filter(Boolean)
+        )];
+
+        const institutions = [...new Set(
+          articles.map(art => art.institution).filter(Boolean)
+        )];
+
+           levelSelect.innerHTML = `
+            <option value="all">Tous les niveaux</option>
+            ${levels.map(level => `
+              <option value="${level}">${level}</option>
+            `).join('')}
+          `;
+
+           institutionSelect.innerHTML = `
+            <option value="all">Tous les établissements</option>
+            ${institutions.map(institution => `
+              <option value="${institution}">${institution}</option>
+            `).join('')}
+          `;
+
+          levelSelect.value = levels.includes(previousLevel) ? previousLevel : 'all';
+
+          institutionSelect.value = institutions.includes(previousInstitution) ? previousInstitution : 'all';
+      }
+
+      function toggleCustomDomainInput() {
+        const domainSelect = document.getElementById('newSubject');
+        const customInput = document.getElementById('customDomainInput');
+        if (domainSelect.value === 'Autre Domaine') {
+          customInput.classList.remove('hidden');
+        } else {
+          customInput.classList.add('hidden');
+          customInput.value = '';
+        }
+      }
+
+
+      async function checkAdminRole(user) {
+        if (!user) return false;
+
+        try {
+          const adminDoc = await db.collection("admins").doc(user.uid).get();
+          return adminDoc.exists && adminDoc.data().role === "admin";
+        } catch (error) {
+          console.error("Erreur admin :", error);
+          return false;
+        }
+      }
+
+      auth.onAuthStateChanged(async (user) => {
+        isAdminLoggedIn = await checkAdminRole(user);
+        renderArticles();
       });
 
-      container.addEventListener('mouseleave', () => {
-        mouse.x = -1000;
-        mouse.y = -1000;
-      });
+      async function verifyAdminLogin(e) {
+        e.preventDefault();
 
-      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      const particleCount = reduceMotion ? 15 : 45;
+        const email = document.getElementById('adminEmailInput').value.trim();
+        const password = document.getElementById('adminPasswordInput').value;
+        const errorMessage = document.getElementById('loginErrorMessage');
 
-      for (let i = 0; i < particleCount; i++) {
-        particles.push({
-          x: Math.random() * width,
-          y: Math.random() * height,
-          vx: (Math.random() - 0.5) * 0.8,
-          vy: (Math.random() - 0.5) * 0.8,
-          size: Math.random() * 2 + 1.5,
-          color: colors[i % colors.length]
-        });
-      }
+        errorMessage.classList.add('hidden');
 
-      function animate() {
-        ctx.clearRect(0, 0, width, height);
+        try {
+          const credential = await auth.signInWithEmailAndPassword(email, password);
+          const authorized = await checkAdminRole(credential.user);
 
-        particles.forEach((p, index) => {
-          p.x += p.vx;
-          p.y += p.vy;
-
-          if (p.x < 0) p.x = width;
-          if (p.x > width) p.x = 0;
-          if (p.y < 0) p.y = height;
-          if (p.y > height) p.y = 0;
-
-          // Mouse interaction calculation
-          const dx = mouse.x - p.x;
-          const dy = mouse.y - p.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-          
-          let currentSize = p.size;
-          let alpha = 0.4;
-
-          if (distance < mouse.radius) {
-            alpha = 0.9;
-            currentSize = p.size * 1.8;
-            
-            // Connect lines to mouse
-            ctx.beginPath();
-            ctx.moveTo(p.x, p.y);
-            ctx.lineTo(mouse.x, mouse.y);
-            ctx.strokeStyle = p.color;
-            ctx.globalAlpha = (1 - distance / mouse.radius) * 0.35;
-            ctx.lineWidth = 0.8;
-            ctx.stroke();
+          if (!authorized) {
+            await auth.signOut();
+            errorMessage.textContent = "Ce compte n'a pas les autorisations administrateur.";
+            errorMessage.classList.remove('hidden');
+            return;
           }
 
-          // Draw particle
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, currentSize, 0, Math.PI * 2);
-          ctx.fillStyle = p.color;
-          ctx.globalAlpha = alpha;
-          ctx.shadowBlur = distance < mouse.radius ? 12 : 4;
-          ctx.shadowColor = p.color;
-          ctx.fill();
-          ctx.shadowBlur = 0;
-        });
+          isAdminLoggedIn = true;
+          closeModal('adminAuthModal');
+          openModal('addArticleModal');
+          renderArticles();
 
-        requestAnimationFrame(animate);
+        } catch (error) {
+          console.error(error);
+          errorMessage.textContent = "Connexion impossible. Vérifiez vos identifiants.";
+          errorMessage.classList.remove('hidden');
+        }
       }
 
-      animate();
-    })();
 
-    
-const revealObserver = ('IntersectionObserver' in window)
-  ? new IntersectionObserver((entries, observer) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('is-visible');
-          observer.unobserve(entry.target);
+      function requestAdminAccess() {
+        if (isAdminLoggedIn) openModal('addArticleModal');
+        else openModal('adminAuthModal');
+      }
+      function setSubjectFilter(s) { activeSubject = s; renderSubjectTags(); renderArticles(); }
+
+      function setMediaTypeFilter(m) {
+        activeMediaType = m;
+
+        document.querySelectorAll('.media-filter-btn').forEach(btn => {
+          const isActive = btn.id === `filter-${m}`;
+
+          btn.classList.toggle('active', isActive);
+
+          if (isActive) {
+            btn.className =
+              'media-filter-btn active px-4 py-2.5 rounded-xl text-xs font-bold bg-purple-600 text-white shadow-lg border border-purple-500/50';
+          } else {
+            btn.className =
+              'media-filter-btn px-4 py-2.5 rounded-xl text-xs font-bold bg-slate-900 text-slate-400 border border-slate-800';
+          }
+        });
+
+        renderArticles();
+      }
+      function filterArticles() {
+        searchQuery = document.getElementById('searchInput').value;
+        activeLevel = document.getElementById('levelFilter').value;
+        activeInstitution = document.getElementById('institutionFilter').value;
+      
+        renderArticles();
+      }      function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+      function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+      // Interactive Canvas Particles Implementation
+      (function initInteractiveParticles() {
+        const container = document.getElementById('heroParticles');
+        if (!container) return;
+
+        const canvas = document.createElement('canvas');
+        container.appendChild(canvas);
+        const ctx = canvas.getContext('2d');
+
+        let width, height;
+        let particles = [];
+        const mouse = { x: -1000, y: -1000, radius: 120 };
+
+        const colors = ['#A855F7', '#06B6D4', '#84CC16'];
+
+        function resize() {
+          width = canvas.width = container.offsetWidth;
+          height = canvas.height = container.offsetHeight;
         }
-      });
-    }, {
-      threshold: 0.08,
-      rootMargin: '0px 0px -30px 0px'
-    })
-  : null;
 
-function observeRevealElements(elements) {
-  elements.forEach(element => {
-    if (element.classList.contains('is-visible')) return;
+        window.addEventListener('resize', resize);
+        resize();
 
-    if (
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
-      !revealObserver
-    ) {
-      element.classList.add('is-visible');
-      return;
-    }
+        container.addEventListener('mousemove', (e) => {
+          const rect = container.getBoundingClientRect();
+          mouse.x = e.clientX - rect.left;
+          mouse.y = e.clientY - rect.top;
+        });
 
-    revealObserver.observe(element);
-  });
-}
+        container.addEventListener('mouseleave', () => {
+          mouse.x = -1000;
+          mouse.y = -1000;
+        });
 
-observeRevealElements(
-  document.querySelectorAll('.scroll-reveal')
-);
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const particleCount = reduceMotion ? 15 : 45;
 
-    
-renderArticles();
-// ===== SciVault Splash Screen: 1.5 seconds =====
-(() => {
-  const splash = document.getElementById('scivaultSplash');
-  if (!splash) return;
+        for (let i = 0; i < particleCount; i++) {
+          particles.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            vx: (Math.random() - 0.5) * 0.8,
+            vy: (Math.random() - 0.5) * 0.8,
+            size: Math.random() * 2 + 1.5,
+            color: colors[i % colors.length]
+          });
+        }
 
-  window.setTimeout(() => {
-    splash.remove();
-  }, 1500);
-})();
+        function animate() {
+          ctx.clearRect(0, 0, width, height);
 
-  </script>
+          particles.forEach((p, index) => {
+            p.x += p.vx;
+            p.y += p.vy;
+
+            if (p.x < 0) p.x = width;
+            if (p.x > width) p.x = 0;
+            if (p.y < 0) p.y = height;
+            if (p.y > height) p.y = 0;
+
+            // Mouse interaction calculation
+            const dx = mouse.x - p.x;
+            const dy = mouse.y - p.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            let currentSize = p.size;
+            let alpha = 0.4;
+
+            if (distance < mouse.radius) {
+              alpha = 0.9;
+              currentSize = p.size * 1.8;
+
+              // Connect lines to mouse
+              ctx.beginPath();
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(mouse.x, mouse.y);
+              ctx.strokeStyle = p.color;
+              ctx.globalAlpha = (1 - distance / mouse.radius) * 0.35;
+              ctx.lineWidth = 0.8;
+              ctx.stroke();
+            }
+
+            // Draw particle
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, currentSize, 0, Math.PI * 2);
+            ctx.fillStyle = p.color;
+            ctx.globalAlpha = alpha;
+            ctx.shadowBlur = distance < mouse.radius ? 12 : 4;
+            ctx.shadowColor = p.color;
+            ctx.fill();
+            ctx.shadowBlur = 0;
+          });
+
+          requestAnimationFrame(animate);
+        }
+
+        animate();
+      })();
+
+
+      const revealObserver = ('IntersectionObserver' in window)
+        ? new IntersectionObserver((entries, observer) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, {
+          threshold: 0.08,
+          rootMargin: '0px 0px -30px 0px'
+        })
+        : null;
+
+      function observeRevealElements(elements) {
+        elements.forEach(element => {
+          if (element.classList.contains('is-visible')) return;
+
+          if (
+            window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+            !revealObserver
+          ) {
+            element.classList.add('is-visible');
+            return;
+          }
+
+          revealObserver.observe(element);
+        });
+      }
+
+      observeRevealElements(
+        document.querySelectorAll('.scroll-reveal')
+      );
+
+
+      renderArticles();
+      // ===== SciVault Splash Screen: 1.5 seconds =====
+      (() => {
+        const splash = document.getElementById('scivaultSplash');
+        if (!splash) return;
+
+        window.setTimeout(() => {
+          splash.remove();
+        }, 1500);
+      })();
+
+    </script>
 </body>
+
 </html>
